@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register Visitor</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+</head>
+<body>
+  <h2>Register Visitor</h2>
+
+  <form onsubmit="registerVisitor(event)">
+    <input type="text" id="visitorName" placeholder="Visitor Name" required />
+    <input type="file" id="visitorImage" accept="image/*" required />
+    <button type="submit">Register Visitor</button>
+  </form>
+
+  <!-- Preview after register -->
+  <div id="qr-result" style="display:none; margin-top:20px;">
+    <h3 id="visitorNameDisplay"></h3>
+    <img id="visitorPhoto" alt="Visitor Photo" width="150" />
+    <img id="visitorQRDisplay" alt="Visitor QR" width="150" />
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+    // ⚠️ Palitan mo ng sarili mong Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    async function registerVisitor(event) {
+      event.preventDefault();
+
+      const file = document.getElementById("visitorImage").files[0];
+      const visitorName = document.getElementById("visitorName").value;
+
+      if (!file) {
+        alert("Please select a photo!");
+        return;
+      }
+
+      // 1️⃣ Upload photo
+      const storageRef = ref(storage, "visitors/" + Date.now() + "_" + file.name);
+      await uploadBytes(storageRef, file);
+      const photoURL = await getDownloadURL(storageRef);
+
+      // 2️⃣ Create visitor in Firestore
+      const docRef = await addDoc(collection(db, "visitors"), {
+        fullName: visitorName,
+        photoUrl: photoURL,
+        status: "Active",
+        timestamp: serverTimestamp()
+      });
+
+      // 3️⃣ Generate QR with Firestore ID
+      const qrCanvas = document.createElement("div");
+      new QRCode(qrCanvas, {
+        text: docRef.id,
+        width: 150,
+        height: 150
+      });
+
+      // 4️⃣ Get QR image
+      const qrImg = qrCanvas.querySelector("img").src;
+
+      // 5️⃣ Save QR into Firestore
+      await updateDoc(docRef, { qrUrl: qrImg });
+
+      // 6️⃣ Show preview
+      document.getElementById("visitorNameDisplay").innerText = visitorName;
+      document.getElementById("visitorPhoto").src = photoURL;
+      document.getElementById("visitorQRDisplay").src = qrImg;
+      document.getElementById("qr-result").style.display = "block";
+
+      alert("✅ Visitor registered with photo + QR!");
+    }
+  </script>
+</body>
+</html>

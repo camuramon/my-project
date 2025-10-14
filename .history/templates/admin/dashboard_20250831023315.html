@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cypress Admin Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="logout">
+    <form action="{{ url_for('logout') }}" method="POST">
+      <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </form>
+  </div>
+
+  <div class="dashboard-container">
+    <nav class="sidebar">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <div>
+          <h2>Cypress</h2>
+          <p>Admin Dashboard</p>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="active"><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li><a href="{{ url_for('admin_residents') }}"><i class="fas fa-users"></i> Residents</a></li>
+        <li><a href="{{ url_for('admin_visitors') }}"><i class="fas fa-user-friends"></i> Visitors</a></li>
+        <li><a href="{{ url_for('admin_reports') }}"><i class="fas fa-file-alt"></i> Reports</a></li>
+        <li><a href="{{ url_for('admin_settings') }}"><i class="fas fa-cog"></i> Settings</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content">
+      <header>
+        <input type="search" placeholder="Search residents, visitors, plates..." />
+        <div class="header-icons">
+          <div class="notifications"><i class="fas fa-bell"></i><span>3</span></div>
+          <div class="profile"><i class="fas fa-user-circle"></i></div>
+        </div>
+      </header>
+
+      <section class="welcome-section">
+        <h1>Dashboard</h1>
+        <p>Welcome to Cypress Subdivision Admin Panel</p>
+      </section>
+
+      <!-- Yung stats cards at tables same lang -->
+      <section class="stats-cards">
+        <div class="card">
+          <div>Total Residents <i class="fas fa-users icon-green"></i></div>
+          <h2>247</h2>
+          <span class="percentage positive">+12%</span>
+        </div>
+        <div class="card">
+          <div>Active Visitors <i class="fas fa-user-friends icon-blue"></i></div>
+          <h2>18</h2>
+          <span class="percentage positive">+5%</span>
+        </div>
+        <div class="card">
+          <div>Valid QR Codes <i class="fas fa-qrcode icon-green"></i></div>
+          <h2>265</h2>
+          <span class="percentage positive">+8%</span>
+        </div>
+        <div class="card">
+          <div>Vehicles Registered <i class="fas fa-car icon-yellow"></i></div>
+          <h2>312</h2>
+          <span class="percentage positive">+15%</span>
+        </div>
+        <div class="card">
+          <div>Entry Logs Today <i class="fas fa-chart-line icon-green"></i></div>
+          <h2>89</h2>
+          <span class="percentage positive">+22%</span>
+        </div>
+        <div class="card">
+          <div>Properties <i class="fas fa-building icon-grey"></i></div>
+          <h2>156</h2>
+          <span class="percentage">0%</span>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

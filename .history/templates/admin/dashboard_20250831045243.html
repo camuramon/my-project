@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cypress Admin Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+</head>
+
+ 
+</head>
+<body>
+    <aside class="sidebar">
+    <div class="logo">
+        <div class="icon">🛡️</div>
+        <div class="title">
+            <h2>Cypress</h2>
+            <span>Admin Dashboard</span>
+            <div class="logout">
+        <form action="{{ url_for('logout') }}" method="POST">
+            <button type="submit" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+    </div>
+    <nav>
+        <ul class="sidebar-menu">
+            <li class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">
+                <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_residents') %}active{% endif %}">
+                <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_visitors') %}active{% endif %}">
+                <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+            </li>
+            <li>
+                <a href="#"><span class="icon">🔲</span> QR Codes</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_reports') %}active{% endif %}">
+                <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_settings') %}active{% endif %}">
+                <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="search-bar">
+                <input type="search" placeholder="Search residents, visitors, plates..." />
+            </div>
+            <div class="top-icons">
+                <button class="icon-btn">🔔<span class="notification-count">3</span></button>
+                <button class="icon-btn">👤</button>
+            </div>
+        </header>
+
+        <section class="dashboard-header">
+            <h1>Dashboard</h1>
+            <p>Welcome to Cypress Subdivision Admin Panel</p>
+            <div class="actions">
+                <button class="filter-btn">Filter</button>
+                <button class="export-btn">Export</button>
+            </div>
+        </section>
+
+        <section class="stats-cards">
+            <div class="card">
+                <p>Total Residents</p>
+                <h2>247</h2>
+                <div class="card-icon green">👤</div>
+                <span class="percentage positive">+12%</span>
+            </div>
+            <div class="card">
+                <p>Active Visitors</p>
+                <h2>18</h2>
+                <div class="card-icon blue">👥</div>
+                <span class="percentage positive">+5%</span>
+            </div>
+            <div class="card">
+                <p>Valid QR Codes</p>
+                <h2>265</h2>
+                <div class="card-icon green">🔲</div>
+                <span class="percentage positive">+8%</span>
+            </div>
+            <div class="card">
+                <p>Vehicles Registered</p>
+                <h2>312</h2>
+                <div class="card-icon yellow">🚗</div>
+                <span class="percentage positive">+15%</span>
+            </div>
+            <div class="card">
+                <p>Entry Logs Today</p>
+                <h2>89</h2>
+                <div class="card-icon green-dark">📈</div>
+                <span class="percentage positive">+22%</span>
+            </div>
+            <div class="card">
+                <p>Properties</p>
+                <h2>156</h2>
+                <div class="card-icon gray">🏢</div>
+                <span class="percentage neutral">0%</span>
+            </div>
+        </section>
+
+        <section class="tables-section">
+            <div class="table-container">
+                <h3>Recent Visitors <a href="#" class="view-all">View All</a></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Purpose</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Jennifer Anne Lopez</strong></td>
+                            <td>Family Visit</td>
+                            <td><span class="status active">Active</span></td>
+                            <td>👁️</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mark Anthony Garcia</strong></td>
+                            <td>Delivery</td>
+                            <td><span class="status active">Active</span></td>
+                            <td>👁️</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sarah Jane Villareal</strong></td>
+                            <td>Business Meeting</td>
+                            <td><span class="status expired">Expired</span></td>
+                            <td>👁️</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-container">
+                <h3>Resident Activity <a href="#" class="view-all">View All</a></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>John Michael Santos</strong></td>
+                            <td>Block 1, Lot 15, Cypress Hills</td>
+                            <td><span class="status active">Active</span></td>
+                            <td>👁️</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Maria Clara Dela Cruz</strong></td>
+                            <td>Block 2, Lot 8, Cypress Hills</td>
+                            <td><span class="status active">Active</span></td>
+                            <td>👁️</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Roberto Cruz Martinez</strong></td>
+                            <td>Block 3, Lot 22, Cypress Hills</td>
+                            <td><span class="status suspended">Suspended</span></td>
+                            <td>👁️</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

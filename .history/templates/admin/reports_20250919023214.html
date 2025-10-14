@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VMS Reports Dashboard</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="container flex">
+                <aside class="sidebar bg-gray-800 p-4 w-64">
+            <div class="logo flex items-center mb-6">
+                <div class="icon text-3xl mr-2">🛡️</div>
+                <div class="title">
+                    <h2 class="text-xl font-bold">Cypress</h2>
+                    <span class="text-sm text-gray-400">Admin Dashboard</span>
+                </div>
+            </div>
+            <nav>
+                <ul class="sidebar-menu space-y-2">
+                    <li class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">
+                        <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+                    </li>
+                    <li class="{% if request.path == url_for('admin_residents') %}active{% endif %}">
+                        <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+                    </li>
+                    <li class="{% if request.path == url_for('admin_visitors') %}active{% endif %}">
+                        <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+                    </li>
+                    <li class="{% if request.path == url_for('admin_qr') %}active{% endif %}">
+                        <a href="{{ url_for('admin_qr') }}"><span class="icon">🔲</span> QR Codes</a>
+                    </li>
+                    <li class="{% if request.path == url_for('admin_reports') %}active{% endif %}">
+                        <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+                    </li>
+                    <li class="{% if request.path == url_for('admin_settings') %}active{% endif %}">
+                        <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+                <main class="main-content flex-1 p-6">
+            <header class="top-bar flex justify-between items-center mb-6">
+                <div class="search-bar">
+                    <input type="search" placeholder="Search residents, visitors, plates..."
+                           class="px-3 py-2 rounded bg-gray-700 text-white w-64"/>
+                </div>
+                <div class="top-icons flex items-center space-x-4">
+                    <button class="icon-btn relative">🔔
+                        <span class="notification-count absolute -top-2 -right-2 bg-red-600 text-xs rounded-full px-1">
+                            {{ notifications|length }}
+                        </span>
+                    </button>
+                    <button class="icon-btn">👤</button>
+                    <button id="logout-button" class="btn btn-gray text-white font-semibold py-2 px-4 rounded-full">
+                        Logout
+                    </button>
+                </div>
+            </header>
+
+            <script>
+                document.getElementById('logout-button').addEventListener('click', function() {
+                    window.location.href = "/logout";
+                });
+            </script>
+
+                        <section class="flex flex-col lg:flex-row gap-4">
+                <div class="flex-1 space-y-4">
+                    <div class="card p-4 bg-gray-800 rounded">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-lg font-semibold">Visitor Logs per Period</h3>
+                            <div class="flex space-x-2">
+                                <button class="btn-chart-toggle bg-gray-700 hover:bg-gray-600 text-white font-semibold py-1 px-3 rounded text-sm" data-period="daily">Daily</button>
+                                <button class="btn-chart-toggle bg-gray-700 hover:bg-gray-600 text-white font-semibold py-1 px-3 rounded text-sm" data-period="weekly">Weekly</button>
+                                <button class="btn-chart-toggle bg-gray-700 hover:bg-gray-600 text-white font-semibold py-1 px-3 rounded text-sm" data-period="monthly">Monthly</button>
+                                <button class="btn-green bg-green-600 hover:bg-green-500 text-white font-semibold py-1 px-3 rounded text-sm">Export</button>
+                            </div>
+                        </div>
+                        <canvas id="barChart"></canvas>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="card p-4 bg-gray-800 rounded">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-semibold">Entry Purpose Distribution</h3>
+                                <button class="btn-green bg-green-600 hover:bg-green-500 text-white font-semibold py-1 px-3 rounded text-sm">Export</button>
+                            </div>
+                            <canvas id="horizontalChart"></canvas>
+                        </div>
+                        <div class="card p-4 bg-gray-800 rounded">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-lg font-semibold">Vehicles Used</h3>
+                                <button class="btn-green bg-green-600 hover:bg-green-500 text-white font-semibold py-1 px-3 rounded text-sm">Export</button>
+                            </div>
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/3 space-y-4">
+                    <div class="card p-4 bg-gray-800 rounded">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-lg font-semibold">Visitor Geo Distribution</h3>
+                            <button class="btn-green bg-green-600 hover:bg-green-500 text-white font-semibold py-1 px-3 rounded text-sm">Export</button>
+                        </div>
+                        <img src="https://placehold.co/400x250" alt="Geo map" class="w-full rounded">
+                    </div>
+                    <div class="card p-4 bg-gray-800 rounded">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-lg font-semibold">Access Points</h3>
+                            <button class="btn-green bg-green-600 hover:bg-green-500 text-white font-semibold py-1 px-3 rounded text-sm">Export</button>
+                        </div>
+                        <canvas id="accessChart"></canvas>
+                    </div>
+                    <div class="card p-4 bg-gray-800 rounded">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-lg font-semibold">Device Access</h3>
+                            <button class="btn-green bg-green-600 hover:bg-green-500 text-white font-semibold py-1 px-3 rounded text-sm">Export</button>
+                        </div>
+                        <canvas id="deviceChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+                        <section class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div class="card p-4 bg-gray-800 rounded">
+                    <h3 class="text-lg font-semibold mb-2">Visitor Logs</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-600">
+                                    <th class="text-left p-2">Name</th>
+                                    <th class="text-left p-2">Purpose</th>
+                                    <th class="text-left p-2">Vehicle</th>
+                                    <th class="text-left p-2">Time In/Out</th>
+                                    <th class="text-left p-2">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for v in visitors %}
+                                <tr class="border-b border-gray-600 hover:bg-gray-700">
+                                    <td class="p-2">{{ v.fullName }}</td>
+                                    <td class="p-2">{{ v.purpose if v.purpose else 'N/A' }}</td>
+                                    <td class="p-2">{{ v.vehicleType }} - {{ v.plateNumber }}</td>
+                                    <td class="p-2">
+                                        {{ v.timeIn }} / {{ v.timeOut if v.timeOut else '-' }}
+                                    </td>
+                                    <td class="p-2">
+                                        <span class="px-2 py-1 rounded
+                                            {% if v.status == 'Active' %} bg-green-600
+                                            {% elif v.status == 'Exited' %} bg-red-600
+                                            {% else %} bg-gray-600 {% endif %}">
+                                            {{ v.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="{{ url_for('admin_visitors') }}" class="text-blue-400 float-right mt-2">View All</a>
+                    <button class="btn-green mt-2 bg-green-600 hover:bg-green-500 text-white font-semibold py-1 px-3 rounded text-sm">Export</button>
+                </div>
+
+                                <div class="card p-4 bg-gray-800 rounded">
+                    <h3 class="text-lg font-semibold mb-2">Resident Reports</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-600">
+                                    <th class="text-left p-2">Name</th>
+                                    <th class="text-left p-2">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in reports %}
+                                <tr class="border-b border-gray-600 hover:bg-gray-700">
+                                    <td class="p-2">{{ r.residentName }}</td>
+                                    <td class="p-2">
+                                        <span class="px-2 py-1 rounded
+                                            {% if r.status == 'Active' %} bg-green-600
+                                            {% elif r.status == 'Suspended' %} bg-yellow-600
+                                            {% elif r.status == 'Blacklisted' %} bg-red-600
+                                            {% else %} bg-gray-600 {% endif %}">
+                                            {{ r.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="{{ url_for('admin_residents') }}" class="text-blue-400 float-right mt-2">View All</a>
+                    <button class="btn-green mt-2 bg-green-600 hover:bg-green-500 text-white font-semibold py-1 px-3 rounded text-sm">Export</button>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/report.js') }}"></script>
+</body>
+</html>

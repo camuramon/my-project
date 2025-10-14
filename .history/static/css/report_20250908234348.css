@@ -1,0 +1,58 @@
+body {
+  background-color: #121212;
+  color: #E0E0E0;
+  font-family: 'Inter', sans-serif;
+}
+
+.card {
+  background-color: #1E1E2F;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 20px rgba(74,144,226,0.7);
+}
+
+.glow-blue { box-shadow: 0 0 8px #4A90E2; background-color: #4A90E2; }
+.glow-green { box-shadow: 0 0 8px #7ED321; background-color: #7ED321; }
+.glow-yellow { box-shadow: 0 0 8px #F5A623; background-color: #F5A623; }
+.glow-red { box-shadow: 0 0 8px #D0021B; background-color: #D0021B; }
+
+.icon-bg {
+  border-radius: 50%;
+  padding: 10px;
+  margin-right: 12px;
+  display: inline-block;
+}
+
+input, select {
+  background-color: #2D2D3A;
+  color: #E0E0E0;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+input::placeholder {
+  color: #A0A0A0;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  transition: background-color 0.3s;
+}
+
+.btn-blue { background-color: #4A90E2; color: white; }
+.btn-blue:hover { box-shadow: 0 0 10px #4A90E2; }
+
+.btn-green { background-color: #7ED321; color: white; }
+.btn-green:hover { box-shadow: 0 0 10px #7ED321; }
+
+canvas {
+  max-width: 100%;
+  height: auto;
+}

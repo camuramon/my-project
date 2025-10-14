@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VMS Reports Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="icon">🛡️</div>
+      <div class="title">
+        <h2>Cypress</h2>
+        <span>Admin Dashboard</span>
+      </div>
+    </div>
+    <nav>
+      <ul class="sidebar-menu">
+        <li>
+          <a href="#"><span class="icon">🏠</span> Dashboard</a>
+        </li>
+        <li>
+          <a href="#"><span class="icon">👥</span> Residents</a>
+        </li>
+        <li>
+          <a href="#"><span class="icon">👤</span> Visitors</a>
+        </li>
+        <li><a href="#"><span class="icon">🔲</span> QR Codes</a></li>
+        <li class="active">
+          <a href="#"><span class="icon">📄</span> Reports</a>
+        </li>
+        <li>
+          <a href="#"><span class="icon">⚙️</span> Settings</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="search-bar">
+        <input type="search" placeholder="Search residents, visitors, plates..." />
+      </div>
+      <div class="top-icons">
+        <button class="icon-btn">🔔<span class="notification-count">3</span></button>
+        <button class="icon-btn">👤</button>
+      </div>
+    </header>
+
+    <div class="visitor-stats-cards">
+        <div class="card">
+            <h2>Total Visitors</h2>
+            <p>1,234</p>
+            <p class="change">+12% vs last month</p>
+        </div>
+        <div class="card">
+            <h2>Active Residents</h2>
+            <p>567</p>
+            <p class="change negative">-3% vs last month</p>
+        </div>
+        <div class="card">
+            <h2>Pending Entries</h2>
+            <p>89</p>
+            <p class="change">New!</p>
+        </div>
+    </div>
+
+    <div class="charts">
+      <div class="chart-container">
+        <div class="chart-header">
+            <h3>Visitor Logs per Period</h3>
+            <div class="chart-controls">
+                <button class="btn-chart-toggle" data-period="daily">Daily</button>
+                <button class="btn-chart-toggle" data-period="weekly">Weekly</button>
+                <button class="btn-chart-toggle" data-period="monthly">Monthly</button>
+            </div>
+        </div>
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Entry Purpose Distribution</h3>
+        <canvas id="horizontalChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Vehicles Used</h3>
+        <canvas id="pieChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Access Points</h3>
+        <canvas id="accessChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Device Access</h3>
+        <canvas id="deviceChart"></canvas>
+      </div>
+    </div>
+
+    <section class="tables-section">
+    <div class="card">
+      <h3>Visitor Logs</h3>
+      <div class="overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Purpose</th>
+              <th>Vehicle</th>
+              <th>Time In/Out</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>John Doe</td>
+              <td>Delivery</td>
+              <td>Car</td>
+              <td>9:00 AM / 9:15 AM</td>
+              <td>Exited</td>
+            </tr>
+            <tr>
+              <td>Jane Smith</td>
+              <td>Guest</td>
+              <td>Motorcycle</td>
+              <td>10:00 AM / -</td>
+              <td>Inside</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <a href="#" class="btn-green">Export</a>
+    </div>
+    <div class="card">
+      <h3>Resident Reports</h3>
+      <div class="overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Alice Johnson</td>
+              <td><span class="bg-green-600 px-2 py-1 rounded">Active</span></td>
+            </tr>
+            <tr>
+              <td>Bob Lee</td>
+              <td><span class="bg-yellow-600 px-2 py-1 rounded">Suspended</span></td>
+            </tr>
+            <tr>
+              <td>Charlie Brown</td>
+              <td><span class="bg-red-600 px-2 py-1 rounded">Blacklisted</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <a href="#" class="btn-green">Export</a>
+    </div>
+  </section>
+  </main>
+</div>
+<script src="report.js"></script>
+</body>
+</html>

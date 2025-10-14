@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cypress Admin Dashboard - Visitors</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="shield-icon"></div>
+            <h1>Cypress</h1>
+            <p>Admin Dashboard</p>
+        </div>
+        <nav class="navigation">
+            <ul>
+                <li>
+                    <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+                </li>
+                <li class="active">
+                    <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+                </li>
+                <li>
+                    <a href="#"><span class="icon">🔲</span> QR Codes</a>
+                </li>
+                <li>
+                    <a href="#"><span class="icon">📋</span> Reports</a>
+                </li>
+                <li>
+                    <a href="#"><span class="icon">⚙️</span> Settings</a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <input type="search" placeholder="Search residents, visitors, plates..." />
+            <div class="topbar-actions">
+                <button class="btn filter">Filter</button>
+                <button class="btn export">Export</button>
+                <button class="btn register-visitor">+ Register Visitor</button>
+                <div class="notification">
+                    <span class="icon">🔔</span>
+                    <span class="badge">3</span>
+                </div>
+                <div class="profile-icon">👤</div>
+            </div>
+        </header>
+
+        <section class="page-info">
+            <h2>Visitors</h2>
+            <p>Track and manage visitor access</p>
+
+            <div class="search-filter">
+                <input type="search" placeholder="Search by name, plate number, purpose, or host..." />
+                <select>
+                    <option>All QR Codes</option>
+                </select>
+            </div>
+
+            <div class="visitor-log">
+                <h3>Visitor Log</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Visitor ID</th>
+                            <th>Name</th>
+                            <th>Vehicle &amp; ID</th>
+                            <th>Purpose</th>
+                            <th>Host Resident</th>
+                            <th>Visit Time</th>
+                            <th>Visit Status</th>
+                            <th>QR Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visitor in visitors %}
+                        <tr>
+                            <td>{{ visitor.id }}</td>
+                            <td><strong>{{ visitor.name }}</strong></td>
+                            <td>
+                                <strong>{{ visitor.vehicle if visitor.vehicle else "N/A" }}</strong><br />
+                                {{ visitor.id_type if visitor.id_type else "" }}
+                            </td>
+                            <td>{{ visitor.purpose }}</td>
+                            <td>{{ visitor.host if visitor.host else "N/A" }}</td>
+                            <td>
+                                <span class="clock-icon">⏲️</span> In:<br />
+                                <strong>{{ visitor.created_at }}</strong>
+                            </td>
+                            <td>
+                                <span class="status active-visit">Active Visit</span>
+                            </td>
+                            <td>
+                                <span class="qr-status valid">Valid</span>
+                            </td>
+                            <td class="actions">
+                                <span class="icon">👁️</span>
+                                <span class="icon">✏️</span>
+                                <span class="icon">🗑️</span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="9">No visitors found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

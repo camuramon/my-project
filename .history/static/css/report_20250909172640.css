@@ -1,0 +1,316 @@
+/* ===========================
+   RESET & BASE STYLES
+=========================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* prevent horizontal scroll */
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0e0e0f;
+  color: #ddd;
+  min-height: 100vh;
+}
+
+/* ===========================
+   LAYOUT
+=========================== */
+.container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #121314;
+  padding: 20px;
+  flex-shrink: 0;
+  position: fixed;   /* keep it fixed */
+  top: 0;
+  left: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.logo .icon {
+  background-color: #208f3f;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 24px;
+  color: white;
+  margin-right: 10px;
+}
+
+.logo .title h2 {
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.logo .title span {
+  font-size: 12px;
+  color: #888;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-menu li {
+  margin: 15px 0;
+}
+
+.sidebar-menu li a {
+  text-decoration: none;
+  color: #bbb;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-menu li.active a {
+  background-color: #2a2a2e;
+  color: white;
+}
+
+.sidebar-menu li a:hover {
+  background-color: #1d1d1f;
+  color: white;
+}
+
+/* ===========================
+   MAIN CONTENT
+=========================== */
+.main-content {
+  flex-grow: 1;
+  margin-left: 250px;           /* align with sidebar */
+  padding: 25px;
+  background-color: #0e0e0f;
+  min-height: 100vh;
+  width: calc(100% - 250px);    /* prevent overflow */
+  overflow-x: hidden;           /* no horizontal scroll */
+  box-sizing: border-box;
+}
+
+/* ===========================
+   TOP BAR
+=========================== */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  width: 350px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 10px;
+  background-color: #232324;
+  color: #ccc;
+  font-size: 16px;
+}
+
+.search-bar input::placeholder {
+  color: #777;
+}
+
+.top-icons {
+  display: flex;
+  gap: 15px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 20px;
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #e02e41;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  color: white;
+}
+
+/* ===========================
+   CARDS
+=========================== */
+.card {
+  background-color: #151517;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  color: #bbb;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 20px rgba(74,144,226,0.7);
+}
+
+.card h2 {
+  color: white;
+  font-weight: 800;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+.btn-green {
+  background-color: #208f3f;
+  color: white;
+  transition: 0.3s;
+}
+
+.btn-green:hover {
+  background-color: #27b34c;
+  box-shadow: 0 0 10px #27b34c;
+}
+
+.btn-chart-toggle {
+  background-color: #232324;
+  color: #ccc;
+  margin-right: 6px;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-chart-toggle:hover {
+  background-color: #4A90E2;
+  color: white;
+}
+
+/* ===========================
+   TABLES
+=========================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* 🔑 prevent overflow */
+}
+
+th, td {
+  text-align: left;
+  padding: 10px;
+  font-size: 14px;
+  color: #ddd;
+}
+
+thead {
+  background-color: #2a2a2e;
+}
+
+tr {
+  border-bottom: 1px solid #333;
+}
+
+tr:hover {
+  background-color: #252527;
+}
+
+/* ===========================
+   CHARTS
+=========================== */
+.charts {
+  display: flex;
+  flex-wrap: wrap; /* Allows charts to wrap on smaller screens */
+  justify-content: space-between;
+  margin: 20px 0;
+  gap: 20px;
+}
+
+.chart-container {
+  flex: 1 1 calc(50% - 10px); /* 🔑 A flexible width for two columns */
+  min-width: 300px; /* Ensures chart is not too small */
+  max-width: 600px; /* 🔑 Max size to keep charts from being too big */
+  background: #1e1e2f;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+}
+
+.chart-container h3 {
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 400px; /* Prevents chart from being too tall */
+}
+
+.visitor-stats-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.visitor-stats-cards .card {
+  flex: 1;
+  text-align: center;
+}
+
+.visitor-stats-cards .card h2 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.visitor-stats-cards .card .change {
+  font-size: 14px;
+  color: #208f3f;
+}
+
+.visitor-stats-cards .card .change.negative {
+  color: #e02e41;
+}

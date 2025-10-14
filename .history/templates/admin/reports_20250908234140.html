@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VMS Reports Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-900 text-gray-100">
+  <!-- Header Section -->
+  <header class="bg-gray-800 p-4 flex flex-col md:flex-row items-center justify-between">
+    <h1 class="text-2xl font-bold text-blue-400 glow-effect">Reports</h1>
+    <input type="text" placeholder="Search by date, visitor, vehicle, resident" class="flex-1 mx-4 mt-2 md:mt-0 min-w-0">
+    <div class="flex space-x-2 mt-2 md:mt-0">
+      <button class="btn-blue btn-filter">Filter</button>
+      <button class="btn-green btn-export">Export</button>
+    </div>
+  </header>
+
+  <!-- Report Cards -->
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+    <div class="card p-4 flex items-center">
+      <div class="icon-bg glow-blue">
+        <img src="https://placehold.co/40x40/4A90E2/FFFFFF" alt="Visitors icon" class="w-10 h-10 rounded-full">
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold">Total Visitors</h3>
+        <p class="text-2xl">1,245</p>
+        <small>+5% ▲</small>
+      </div>
+    </div>
+    <div class="card p-4 flex items-center">
+      <div class="icon-bg glow-green">
+        <img src="https://placehold.co/40x40/7ED321/FFFFFF" alt="Residents icon" class="w-10 h-10 rounded-full">
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold">Total Residents</h3>
+        <p class="text-2xl">320</p>
+        <small>+2% ▲</small>
+      </div>
+    </div>
+    <div class="card p-4 flex items-center">
+      <div class="icon-bg glow-yellow">
+        <img src="https://placehold.co/40x40/F5A623/FFFFFF" alt="Clock icon" class="w-10 h-10 rounded-full">
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold">Avg Visit Duration</h3>
+        <p class="text-2xl">45 min</p>
+        <small>-1% ▼</small>
+      </div>
+    </div>
+    <div class="card p-4 flex items-center">
+      <div class="icon-bg glow-red">
+        <img src="https://placehold.co/40x40/D0021B/FFFFFF" alt="Entry logs icon" class="w-10 h-10 rounded-full">
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold">Entry Logs Today</h3>
+        <p class="text-2xl">150</p>
+        <small>+12% ▲</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Charts and Side Widgets -->
+  <section class="flex flex-col lg:flex-row gap-4 p-4">
+    <!-- Main Charts -->
+    <div class="flex-1">
+      <div class="card p-4 mb-4">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-semibold">Visitor Logs per Period</h3>
+          <div class="flex space-x-2">
+            <button class="btn-chart-toggle" data-period="daily">Daily</button>
+            <button class="btn-chart-toggle" data-period="weekly">Weekly</button>
+            <button class="btn-chart-toggle" data-period="monthly">Monthly</button>
+            <button class="btn-green">Export</button>
+          </div>
+        </div>
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-lg font-semibold">Entry Purpose Distribution</h3>
+            <button class="btn-green">Export</button>
+          </div>
+          <canvas id="horizontalChart"></canvas>
+        </div>
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-lg font-semibold">Vehicles Used</h3>
+            <button class="btn-green">Export</button>
+          </div>
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <!-- Side Widgets -->
+    <div class="lg:w-1/3 space-y-4">
+      <div class="card p-4">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-semibold">Visitor Geo Distribution</h3>
+          <button class="btn-green">Export</button>
+        </div>
+        <img src="https://placehold.co/400x250" alt="Geo map" class="w-full rounded">
+      </div>
+      <div class="card p-4">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-semibold">Access Points</h3>
+          <button class="btn-green">Export</button>
+        </div>
+        <canvas id="accessChart"></canvas>
+      </div>
+      <div class="card p-4">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-semibold">Device Access</h3>
+          <button class="btn-green">Export</button>
+        </div>
+        <canvas id="deviceChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tables -->
+  <section class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card p-4">
+      <h3 class="text-lg font-semibold mb-2">Visitor Logs</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-600">
+              <th class="text-left p-2">Name</th>
+              <th class="text-left p-2">Purpose</th>
+              <th class="text-left p-2">Vehicle</th>
+              <th class="text-left p-2">Time In/Out</th>
+              <th class="text-left p-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-600 hover:bg-gray-800">
+              <td class="p-2">John Doe</td>
+              <td class="p-2">Delivery</td>
+              <td class="p-2">Car</td>
+              <td class="p-2">9:00 AM / 9:15 AM</td>
+              <td class="p-2">Exited</td>
+            </tr>
+            <tr class="border-b border-gray-600 hover:bg-gray-800">
+              <td class="p-2">Jane Smith</td>
+              <td class="p-2">Guest</td>
+              <td class="p-2">Motorcycle</td>
+              <td class="p-2">10:00 AM / -</td>
+              <td class="p-2">Inside</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <a href="#" class="text-blue-400 float-right mt-2">View All</a>
+      <button class="btn-green mt-2">Export</button>
+    </div>
+    <div class="card p-4">
+      <h3 class="text-lg font-semibold mb-2">Resident Reports</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-600">
+              <th class="text-left p-2">Name</th>
+              <th class="text-left p-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-600 hover:bg-gray-800">
+              <td class="p-2">Alice Johnson</td>
+              <td class="p-2"><span class="bg-green-600 px-2 py-1 rounded">Active</span></td>
+            </tr>
+            <tr class="border-b border-gray-600 hover:bg-gray-800">
+              <td class="p-2">Bob Lee</td>
+              <td class="p-2"><span class="bg-yellow-600 px-2 py-1 rounded">Suspended</span></td>
+            </tr>
+            <tr class="border-b border-gray-600 hover:bg-gray-800">
+              <td class="p-2">Charlie Brown</td>
+              <td class="p-2"><span class="bg-red-600 px-2 py-1 rounded">Blacklisted</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <a href="#" class="text-blue-400 float-right mt-2">View All</a>
+      <button class="btn-green mt-2">Export</button>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

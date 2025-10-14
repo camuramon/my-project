@@ -1,0 +1,280 @@
+/* === GLOBAL STYLES === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #111315;
+  color: #ffffff;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  width: 250px;
+  background-color: #0d0f10;
+  color: #fff;
+  height: 100vh;
+  position: fixed;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  font-size: 24px;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin-top: 40px;
+  flex-grow: 1;
+}
+
+.sidebar-menu li {
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.sidebar-menu li.active,
+.sidebar-menu li:hover {
+  background-color: #1a1d1f;
+}
+
+/* === MAIN CONTENT === */
+.main-content {
+  margin-left: 270px;
+  padding: 30px;
+}
+
+/* === HEADER === */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+header input[type="search"] {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  width: 300px;
+  background-color: #1a1d1f;
+  color: #fff;
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.notifications {
+  position: relative;
+}
+
+.notifications span {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: red;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
+/* === WELCOME SECTION === */
+.welcome-section h1 {
+  font-size: 32px;
+  margin-bottom: 5px;
+}
+
+.welcome-section p {
+  color: #aaa;
+}
+
+/* === STATS CARDS === */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background-color: #1a1d1f;
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+}
+
+.card div {
+  font-size: 14px;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card h2 {
+  font-size: 24px;
+  margin: 5px 0;
+}
+
+.percentage {
+  font-size: 14px;
+  display: block;
+  margin-top: 10px;
+  color: #ccc;
+}
+
+.percentage.positive {
+  color: #4caf50;
+}
+
+/* === ICON COLORS === */
+.icon-green {
+  color: #4caf50;
+}
+
+.icon-blue {
+  color: #2196f3;
+}
+
+.icon-yellow {
+  color: #ffeb3b;
+}
+
+.icon-grey {
+  color: #9e9e9e;
+}
+
+/* === TABLES === */
+.tables-section {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.table-container {
+  background-color: #1a1d1f;
+  padding: 20px;
+  border-radius: 12px;
+  flex: 1;
+  min-width: 400px;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.table-header h3 {
+  margin: 0;
+}
+
+.table-header a {
+  color: #4caf50;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #333;
+  font-size: 14px;
+}
+
+td strong {
+  font-weight: 600;
+}
+
+/* === STATUS STYLES === */
+.status {
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  display: inline-block;
+  text-align: center;
+}
+
+.status.active {
+  background-color: #1e4620;
+  color: #4caf50;
+}
+
+.status.expired {
+  background-color: #665100;
+  color: #ffeb3b;
+}
+
+.status.suspended {
+  background-color: #4b0e0e;
+  color: #f44336;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .tables-section {
+    flex-direction: column;
+  }
+}
+.logout form {
+  display: inline;
+}
+
+.logout-btn {
+  background-color: #b91c1c; /* red */
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn i {
+  margin-right: 6px;
+}
+
+.logout-btn:hover {
+  background-color: #7f1d1d;
+}

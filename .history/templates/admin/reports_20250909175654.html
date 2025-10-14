@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VMS Reports Dashboard</title>
+ <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/report.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="icon">🛡️</div>
+      <div class="title">
+        <h2>Cypress</h2>
+        <span>Admin Dashboard</span>
+      </div>
+    </div>
+    <nav>
+      <ul class="sidebar-menu">
+        <li class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">
+          <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_residents') %}active{% endif %}">
+          <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_visitors') %}active{% endif %}">
+          <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+        </li>
+        <li><a href="#"><span class="icon">🔲</span> QR Codes</a></li>
+        <li class="{% if request.path == url_for('admin_reports') %}active{% endif %}">
+          <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_settings') %}active{% endif %}">
+          <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="search-bar">
+        <input type="search" placeholder="Search residents, visitors, plates..." />
+      </div>
+      <div class="top-icons">
+        <button class="icon-btn">🔔<span class="notification-count">{{ notifications|length }}</span></button>
+        <button class="icon-btn">👤</button>
+      </div>
+    </header>
+
+ 
+  <!-- Main Charts and Side Widgets -->
+<section class="flex flex-col lg:flex-row gap-4">
+
+    <!-- Main Charts -->
+    <div class="flex-1">
+      <div class="card p-4 mb-4">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-semibold">Visitor Logs per Period</h3>
+          <div class="flex space-x-2">
+            <button class="btn-chart-toggle" data-period="daily">Daily</button>
+            <button class="btn-chart-toggle" data-period="weekly">Weekly</button>
+            <button class="btn-chart-toggle" data-period="monthly">Monthly</button>
+            <button class="btn-green">Export</button>
+          </div>
+        </div>
+        <canvas id="barChart"></canvas>
+      </div>
+   <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-lg font-semibold">Entry Purpose Distribution</h3>
+            <button class="btn-green">Export</button>
+          </div>
+          <canvas id="horizontalChart"></canvas>
+        </div>
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-lg font-semibold">Vehicles Used</h3>
+            <button class="btn-green">Export</button>
+          </div>
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <!-- Side Widgets -->
+    <div class="lg:w-1/3 space-y-4">
+      <div class="card p-4">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-semibold">Visitor Geo Distribution</h3>
+          <button class="btn-green">Export</button>
+        </div>
+        <img src="https://placehold.co/400x250" alt="Geo map" class="w-full rounded">
+      </div>
+      <div class="card p-4">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-semibold">Access Points</h3>
+          <button class="btn-green">Export</button>
+        </div>
+        <canvas id="accessChart"></canvas>
+      </div>
+      <div class="card p-4">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-semibold">Device Access</h3>
+          <button class="btn-green">Export</button>
+        </div>
+        <canvas id="deviceChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tables -->
+  <section class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="card p-4">
+      <h3 class="text-lg font-semibold mb-2">Visitor Logs</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-600">
+              <th class="text-left p-2">Name</th>
+              <th class="text-left p-2">Purpose</th>
+              <th class="text-left p-2">Vehicle</th>
+              <th class="text-left p-2">Time In/Out</th>
+              <th class="text-left p-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-600 hover:bg-gray-800">
+              <td class="p-2">John Doe</td>
+              <td class="p-2">Delivery</td>
+              <td class="p-2">Car</td>
+              <td class="p-2">9:00 AM / 9:15 AM</td>
+              <td class="p-2">Exited</td>
+            </tr>
+            <tr class="border-b border-gray-600 hover:bg-gray-800">
+              <td class="p-2">Jane Smith</td>
+              <td class="p-2">Guest</td>
+              <td class="p-2">Motorcycle</td>
+              <td class="p-2">10:00 AM / -</td>
+              <td class="p-2">Inside</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <a href="#" class="text-blue-400 float-right mt-2">View All</a>
+      <button class="btn-green mt-2">Export</button>
+    </div>
+    <div class="card p-4">
+      <h3 class="text-lg font-semibold mb-2">Resident Reports</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-600">
+              <th class="text-left p-2">Name</th>
+              <th class="text-left p-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-600 hover:bg-gray-800">
+              <td class="p-2">Alice Johnson</td>
+              <td class="p-2"><span class="bg-green-600 px-2 py-1 rounded">Active</span></td>
+            </tr>
+            <tr class="border-b border-gray-600 hover:bg-gray-800">
+              <td class="p-2">Bob Lee</td>
+              <td class="p-2"><span class="bg-yellow-600 px-2 py-1 rounded">Suspended</span></td>
+            </tr>
+            <tr class="border-b border-gray-600 hover:bg-gray-800">
+              <td class="p-2">Charlie Brown</td>
+              <td class="p-2"><span class="bg-red-600 px-2 py-1 rounded">Blacklisted</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <a href="#" class="text-blue-400 float-right mt-2">View All</a>
+      <button class="btn-green mt-2">Export</button>
+    </div>
+  </section>
+
+<script src="{{ url_for('static', filename='js/report.js') }}"></script>
+</body>
+</html>

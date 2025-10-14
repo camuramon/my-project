@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cypress Admin Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="icon">🛡️</div>
+      <div class="title">
+        <h2>Cypress</h2>
+        <span>Admin Dashboard</span>
+      </div>
+    </div>
+    <nav>
+      <ul class="sidebar-menu">
+        <li class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">
+          <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_residents') %}active{% endif %}">
+          <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_visitors') %}active{% endif %}">
+          <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+        </li>
+        <li><a href="#"><span class="icon">🔲</span> QR Codes</a></li>
+        <li class="{% if request.path == url_for('admin_reports') %}active{% endif %}">
+          <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_settings') %}active{% endif %}">
+          <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="search-bar">
+        <input type="search" placeholder="Search residents, visitors, plates..." />
+      </div>
+      <div class="top-icons">
+        <button class="icon-btn">🔔<span class="notification-count">{{ notifications|length }}</span></button>
+        <button class="icon-btn">👤</button>
+         <button id="logout-button" class="btn btn-gray text-white font-semibold py-2 px-4 rounded-full">
+                Logout
+            </button>
+      </div>
+    </header>
+
+    <section class="dashboard-header">
+      <h1>Dashboard</h1>
+      <h2>Welcome to Cypress Subdivision Admin Panel</h2>
+      <div class="actions">
+        <button class="filter-btn">Filter</button>
+        <button class="export-btn">Export</button>
+      </div>
+    </section>
+
+    <!-- Cards Section -->
+    <section class="stats-cards">
+      <div class="card">
+        <p>Total Residents</p>
+        <h2>{{ total_residents }}</h2>
+        <div class="card-icon green">👤</div>
+        <span class="percentage positive">+12%</span>
+      </div>
+
+      <div class="card">
+        <p>Active Visitors</p>
+        <h2>{{ active_visitors }}</h2>
+        <div class="card-icon blue">👥</div>
+        <span class="percentage positive">+5%</span>
+      </div>
+
+      <div class="card">
+        <p>Valid QR Codes</p>
+        <h2>{{ valid_qr_codes }}</h2>
+        <div class="card-icon green">🔲</div>
+        <span class="percentage positive">+8%</span>
+      </div>
+
+      <div class="card">
+        <p>Vehicles Registered</p>
+        <h2>{{ total_vehicles }}</h2>
+        <div class="card-icon yellow">🚗</div>
+        <span class="percentage positive">+15%</span>
+      </div>
+
+      <div class="card">
+        <p>Entry Logs Today</p>
+        <h2>{{ entry_logs_today }}</h2>
+        <div class="card-icon green-dark">📈</div>
+        <span class="percentage positive">+22%</span>
+      </div>
+
+      <div class="card">
+        <p>Properties</p>
+        <h2>{{ total_properties }}</h2>
+        <div class="card-icon gray">🏢</div>
+        <span class="percentage neutral">0%</span>
+      </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="charts">
+      <div class="chart-container">
+        <h3>Visitor Vehicle Distribution</h3>
+        <canvas id="vehicleChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Residents vs Visitors</h3>
+        <canvas id="resVsVisitorsChart"></canvas>
+      </div>
+    </section>
+
+   <!-- Tables Section -->
+<section class="tables-section">
+  <div class="table-container">
+    <h3>Recent Visitors <a href="#" class="view-all">View All</a></h3>
+    <table id="visitorTable">
+      <thead>
+       
+        <tr>
+        
+          <th>Name</th>
+          <th>Purpose</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for visitor in visitors %}
+        <tr>
+          <td><strong>{{ visitor.fullName }}</strong></td>
+          <td>{{ visitor.purpose }}</td>
+          <td>
+            <span class="status {{ visitor.status|lower }}">
+              {{ visitor.status }}
+            </span>
+          </td>
+          <td>👁️</td>
+        </tr>
+        {% endfor %}
+        
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-container">
+    <h3>Resident Activity <a href="#" class="view-all">View All</a></h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Address</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for resident in residents %}
+        <tr>
+          <td><strong>{{ resident.fullName }}</strong></td>
+          <td>{{ resident.address }}</td>
+          <td>
+            <span class="status {{ resident.status|lower }}">
+              {{ resident.status }}
+            </span>
+          </td>
+          <td>👁️</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- Chart.js Scripts -->
+<script>
+    // --- Log Out functionality ---
+       document.getElementById('logout-button').addEventListener('click', function() {
+    window.location.href = "/logout";   // ✅ tatawag sa Flask logout route
+});
+
+  // Vehicle Chart (Pie)
+  const vehicleChart = new Chart(document.getElementById("vehicleChart"), {
+    type: "pie",
+    data: {
+      labels: ["Car", "Motorcycle", "Bicycle", "Other"],
+      datasets: [{
+        data: [12, 19, 3, 5], // sample data, replace with Flask/Firebase data
+        backgroundColor: ["#36A2EB", "#FFCE56", "#FF6384", "#8BC34A"]
+      }]
+    }
+  });
+  
+
+  // Residents vs Visitors (Bar)
+  const resVsVisitorsChart = new Chart(document.getElementById("resVsVisitorsChart"), {
+    type: "bar",
+    data: {
+      labels: ["Residents", "Visitors"],
+      datasets: [{
+        label: "Count",
+        data: [{{ total_residents }}, {{ active_visitors }}],
+        backgroundColor: ["#42A5F5", "#66BB6A"]
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  }); 
+</script>
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

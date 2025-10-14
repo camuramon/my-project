@@ -1,0 +1,27 @@
+/* Normal styles */
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+/* PRINT STYLES */
+@media print {
+  body * {
+    visibility: hidden;   /* lahat hide */
+  }
+  #qr-result, #qr-result * {
+    visibility: visible;  /* ipakita lang yung buong QR result section */
+  }
+  #qr-result {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+  }
+  /* OPTIONAL: kung ayaw mo lumabas yung title at button */
+  #qr-result h3,
+  #qr-result button {
+    display: none;
+  }
+}

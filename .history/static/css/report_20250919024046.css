@@ -1,0 +1,365 @@
+/* ===========================
+   RESET & BASE STYLES
+=========================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0e0e0f;
+  color: #ddd;
+  min-height: 100vh;
+}
+
+/* ===========================
+   LAYOUT
+=========================== */
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #121314;
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.logo .icon {
+  background-color: #208f3f;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 24px;
+  color: white;
+  margin-right: 10px;
+}
+
+.logo .title h2 {
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.logo .title span {
+  font-size: 12px;
+  color: #888;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-menu li {
+  margin: 15px 0;
+}
+
+.sidebar-menu li a {
+  text-decoration: none;
+  color: #bbb;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-menu li.active a {
+  background-color: #2a2a2e;
+  color: white;
+}
+
+.sidebar-menu li a:hover {
+  background-color: #1d1d1f;
+  color: white;
+}
+
+/* ===========================
+   MAIN CONTENT
+=========================== */
+.main-content {
+  flex-grow: 1;
+  margin-left: 250px;  /* ✅ balik sa tama */
+  padding: 25px;
+  background-color: #0e0e0f;
+  min-height: 100vh;
+  width: calc(100% - 250px);
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* ===========================
+   TOP BAR
+=========================== */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  width: 350px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 10px;
+  background-color: #232324;
+  color: #ccc;
+  font-size: 16px;
+}
+
+.search-bar input::placeholder {
+  color: #777;
+}
+
+.top-icons {
+  display: flex;
+  gap: 15px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 20px;
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #e02e41;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  color: white;
+}
+
+/* ===========================
+   CARDS
+=========================== */
+.card {
+  background-color: #151517;
+  border-radius: 12px;
+  padding: 20px;
+  color: #bbb;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 20px rgba(74,144,226,0.7);
+}
+
+.card h2 {
+  color: white;
+  font-weight: 800;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+.btn-green {
+  background-color: #208f3f;
+  color: white;
+  transition: 0.3s;
+}
+
+.btn-green:hover {
+  background-color: #27b34c;
+  box-shadow: 0 0 10px #27b34c;
+}
+
+.btn-chart-toggle {
+  background-color: #232324;
+  color: #ccc;
+  margin-right: 6px;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-chart-toggle:hover {
+  background-color: #4A90E2;
+  color: white;
+}
+/* === General Table === */
+.table-dark {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table-dark th, 
+.table-dark td {
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f0f0f0;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+/* Center align specific columns */
+.table-dark th:nth-child(1),
+.table-dark td:nth-child(1),  /* Photo */
+.table-dark th:nth-child(6),
+.table-dark td:nth-child(6),  /* QR Status */
+.table-dark th:nth-child(7),
+.table-dark td:nth-child(7) { /* Actions */
+  text-align: center;
+}
+
+/* Visitor Photo */
+.table-dark td img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Status Badges */
+.status, .qr-status {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  text-align: center;
+}
+.status-badge {
+    padding: 0.25rem 0.5rem; /* px-2 py-1 */
+    border-radius: 0.25rem;  /* rounded */
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background-color: #90ee90; /* light green */
+    color: #006400;           /* dark green text */
+}
+
+.status-badge.exited {
+    background-color: #dc2626; /* red */
+    color: white;
+}
+
+.status-badge.other {
+    background-color: #6b7280; /* gray */
+    color: white;
+}
+
+/* Colors */
+.active-visit, .valid {
+  background: #22c55e; /* green */
+  color: white;
+}
+
+.expired-visit, .invalid {
+  background: #eab308; /* yellow */
+  color: black;
+}
+
+.suspended, .invalid {
+  background: #dc2626; /* red */
+  color: white;
+}
+
+/* Actions icons */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.actions .icon {
+  cursor: pointer;
+  font-size: 16px;
+  color: #d1d5db;
+  transition: color 0.2s ease;
+}
+
+.actions .icon:hover {
+  color: #22c55e;
+}
+
+/* ===========================
+   TABLES
+=========================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th, td {
+  text-align: left;
+  padding: 10px;
+  font-size: 14px;
+  color: #ddd;
+}
+
+thead {
+  background-color: #2a2a2e;
+}
+
+tr {
+  border-bottom: 1px solid #333;
+}
+
+tr:hover {
+  background-color: #252527;
+}
+
+/* ===========================
+   CHARTS
+=========================== */
+.chart-container canvas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 300px;
+}

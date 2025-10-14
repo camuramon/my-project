@@ -1,0 +1,80 @@
+.qr-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.qr-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.qr-card h3 {
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.visitor-photo {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.visitor-qr {
+  width: 120px;
+  height: 120px;
+  margin: 10px 0;
+}
+.status {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.status.active {
+  background-color: #31f020; /* green */
+}
+
+.status.suspended {
+  background-color: #ca8a04; /* yellow */
+}
+
+.status.expired {
+  background-color: #7e4040; /* gray */
+}
+
+.status.blacklisted {
+  background-color: #dc2626; /* red */
+}
+/* Table layout fix */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* lahat ng column fixed width */
+}
+
+/* Table headers at cells */
+th, td {
+  padding: 12px 10px;
+  text-align: center;   /* pantayin lahat sa gitna */
+  vertical-align: middle; /* pantayin vertically */
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Visitor photo fix */
+.visitor-photo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto; /* center sa loob ng cell */
+}

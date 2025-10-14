@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cypress Admin Dashboard - Visitors</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="shield-icon"></div>
+            <h1>Cypress</h1>
+            <p>Admin Dashboard</p>
+        </div>
+        <nav class="navigation">
+            <ul>
+                <li class="active">
+                    <a href="#"><span class="icon">🏠</span> Dashboard</a>
+                </li>
+                <li><a href="#"><span class="icon">👥</span> Residents</a></li>
+                <li><a href="#"><span class="icon">👤</span> Visitors</a></li>
+                <li><a href="#"><span class="icon">🔲</span> QR Codes</a></li>
+                <li><a href="#"><span class="icon">📋</span> Reports</a></li>
+                <li><a href="#"><span class="icon">⚙️</span> Settings</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <input type="search" placeholder="Search residents, visitors, plates..." />
+            <div class="topbar-actions">
+                <button class="btn filter">Filter</button>
+                <button class="btn export">Export</button>
+                <button class="btn register-visitor">+ Register Visitor</button>
+                <div class="notification">
+                    <span class="icon">🔔</span>
+                    <span class="badge">3</span>
+                </div>
+                <div class="profile-icon">👤</div>
+            </div>
+        </header>
+
+        <section class="page-info">
+            <h2>Visitors</h2>
+            <p>Track and manage visitor access</p>
+
+            <div class="search-filter">
+                <input type="search" placeholder="Search by name, plate number, purpose, or host..." />
+                <select>
+                    <option>All QR Codes</option>
+                </select>
+            </div>
+
+            <div class="visitor-log">
+                <h3>Visitor Log (5)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Visitor ID</th>
+                            <th>Name</th>
+                            <th>Vehicle &amp; ID</th>
+                            <th>Purpose</th>
+                            <th>Host Resident</th>
+                            <th>Visit Time</th>
+                            <th>Visit Status</th>
+                            <th>QR Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>V001</td>
+                            <td>
+                                <strong>Jennifer Anne Lopez</strong>
+                            </td>
+                            <td>
+                                <strong>Sedan - MNO 1357</strong><br />
+                                Driver's License: D12-34-567890
+                            </td>
+                            <td>Family Visit</td>
+                            <td>
+                                John Michael <br />
+                                Santos
+                            </td>
+                            <td>
+                                <span class="clock-icon">⏲️</span> In:<br />
+                                <strong>14:30</strong>
+                            </td>
+                            <td><span class="status active-visit">Active Visit</span></td>
+                            <td><span class="qr-status valid">Valid</span></td>
+                            <td class="actions">
+                                <span class="icon">👁️</span>
+                                <span class="icon">✏️</span>
+                                <span class="icon">🗑️</span>
+                            </td>
+                        </tr>
+                        <!-- Additional visitor rows go here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

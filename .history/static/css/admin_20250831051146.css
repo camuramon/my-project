@@ -1,0 +1,298 @@
+/* ===========================
+   GENERAL RESET & BASE STYLES
+=========================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0e0e0f;
+    color: #ddd;
+    display: flex;
+    min-height: 100vh;
+}
+.container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+/* ===========================
+   SIDEBAR
+=========================== */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    color: #aaa;
+    font-weight: 600;
+    transition: background 0.3s, color 0.3s;
+}
+
+.sidebar-menu li a i {
+    font-size: 1.2rem;
+}
+
+.sidebar-menu li.active a,
+.sidebar-menu li a:hover {
+    background-color: #292929;
+    color: white;
+}
+
+
+/* ===========================
+   MAIN CONTENT
+=========================== */
+.main-content {
+    flex-grow: 1;
+    padding: 25px;
+    overflow-y: auto;
+}
+
+/* ===========================
+   HEADER / TOP BAR
+=========================== */
+.top-bar, .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-bar input[type="search"] {
+    width: 350px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    background-color: #232324;
+    color: #ccc;
+    font-size: 16px;
+}
+
+.top-icons, .header-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.icon-btn, .notification-btn, .user-btn {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 20px;
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #e02e41;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    color: white;
+}
+
+/* ===========================
+   DASHBOARD HEADER & ACTIONS
+=========================== */
+.dashboard-header, .resident-section .sub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.dashboard-header h1, .resident-section h2 {
+    color: white;
+}
+
+.dashboard-header p, .resident-section .subtitle {
+    color: #999;
+    margin-left: 10px;
+}
+
+.actions, .buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-btn,
+.export-btn,
+.add-resident-btn {
+    background-color: #222;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.add-resident-btn {
+    background-color: #208f3f;
+}
+
+.filter-btn:hover,
+.export-btn:hover,
+.add-resident-btn:hover {
+    background-color: #333;
+}
+
+/* ===========================
+   DASHBOARD CARDS
+=========================== */
+.stats-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.card {
+    background-color: #151517;
+    border-radius: 12px;
+    flex: 1 1 300px;
+    padding: 20px;
+    position: relative;
+    color: #999;
+}
+
+.card p { margin-bottom: 8px; }
+
+.card h2 { color: white; font-weight: 800; font-size: 28px; }
+
+.card-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    padding: 8px;
+    border-radius: 100%;
+    background-color: #333;
+    color: white;
+}
+
+.card-icon.green { background-color: #208f3f; }
+.card-icon.blue { background-color: #26418f; }
+.card-icon.yellow { background-color: #a58f20; }
+.card-icon.green-dark { background-color: #14502d; }
+.card-icon.gray { background-color: #474751; }
+
+.percentage {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.percentage.positive { color: #26ca4a; }
+.percentage.neutral { color: #999; }
+
+/* ===========================
+   TABLES
+=========================== */
+.tables-section, .resident-directory {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.table-container {
+    background-color: #151517;
+    padding: 20px;
+    border-radius: 12px;
+    flex: 1 1 500px;
+    color: #bbb;
+}
+
+.table-container h3 {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.view-all {
+    color: #6668f8;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.view-all:hover { text-decoration: underline; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 10px;
+    text-align: left;
+    font-size: 14px;
+}
+
+thead tr { border-bottom: 1px solid #333; }
+tbody tr:not(:last-child) { border-bottom: 1px solid #333; }
+tbody tr:hover { background-color: #252527; }
+
+/* ===========================
+   STATUS BADGES
+=========================== */
+.status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.status.active { background-color: #208f3f; color: white; }
+.status.expired { background-color: #a5891e; color: white; }
+.status.suspended { background-color: #7e1e1e; color: white; }
+.status.inactive { background-color: #ff4d4f; color: white; }
+
+.qr-status.valid { background-color: #208f3f; color: white; }
+.qr-status.expired { background-color: #a5891e; color: white; }
+
+/* ===========================
+   BUTTONS, INPUTS, SELECT
+=========================== */
+button { cursor: pointer; border: none; border-radius: 6px; font-weight: 600; }
+
+select, input[type="search"] {
+    background-color: #232324;
+    color: #ccc;
+    border: 1px solid #333;
+    padding: 8px 10px;
+    border-radius: 6px;
+}
+
+/* ===========================
+   HEADINGS & TEXT
+=========================== */
+h2 { font-size: 22px; margin-bottom: 5px; }
+h3 { font-size: 18px; margin-bottom: 10px; }
+.subtitle { color: #aaa; margin-bottom: 15px; }
+
+strong { font-weight: 700; }

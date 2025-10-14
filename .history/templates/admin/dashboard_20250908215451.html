@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cypress Admin Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="icon">🛡️</div>
+      <div class="title">
+        <h2>Cypress</h2>
+        <span>Admin Dashboard</span>
+      </div>
+    </div>
+    <nav>
+      <ul class="sidebar-menu">
+        <li class="active"><a href="#"><span class="icon">🏠</span> Dashboard</a></li>
+        <li><a href="#"><span class="icon">👥</span> Residents</a></li>
+        <li><a href="#"><span class="icon">👤</span> Visitors</a></li>
+        <li><a href="#"><span class="icon">🔲</span> QR Codes</a></li>
+        <li><a href="#"><span class="icon">📄</span> Reports</a></li>
+        <li><a href="#"><span class="icon">⚙️</span> Settings</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="search-bar">
+        <input type="search" placeholder="Search residents, visitors, plates..." />
+      </div>
+      <div class="top-icons">
+        <button class="icon-btn">🔔<span class="notification-count">0</span></button>
+        <button class="icon-btn">👤</button>
+      </div>
+    </header>
+
+    <section class="dashboard-header">
+      <h1>Dashboard</h1>
+      <p>Welcome to Cypress Subdivision Admin Panel</p>
+    </section>
+
+    <!-- Chart Section -->
+    <section class="charts">
+      <h2>Vehicle Distribution</h2>
+      <canvas id="vehicleChart"></canvas>
+    </section>
+
+    <section class="tables-section">
+      <div class="table-container">
+        <h3>Recent Visitors <a href="#" class="view-all">View All</a></h3>
+        <table id="visitorTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Purpose</th>
+              <th>Vehicle</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Visitors data will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+<script>
+  // 🔧 Replace with your Firebase project credentials (from Firebase Console)
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // Load Visitors into Table
+  async function loadVisitors() {
+    const visitorTable = document.getElementById("visitorTable").getElementsByTagName("tbody")[0];
+    visitorTable.innerHTML = "";
+
+    const snapshot = await db.collection("visitors").get();
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const row = `
+        <tr>
+          <td><strong>${data.fullName || "Unknown"}</strong></td>
+          <td>${data.purpose || "-"}</td>
+          <td>${data.vehicleType || "-"}</td>
+          <td><span class="status ${data.status === "Active" ? "active" : "expired"}">${data.status || "-"}</span></td>
+        </tr>`;
+      visitorTable.innerHTML += row;
+    });
+  }
+
+  // Load Vehicle Pie Chart
+  async function loadVehicleChart() {
+    const counts = {};
+
+    const snapshot = await db.collection("visitors").get();
+    snapshot.forEach((doc) => {
+      const type = doc.data().vehicleType || "Unknown";
+      counts[type] = (counts[type] || 0) + 1;
+    });
+
+    new Chart(document.getElementById("vehicleChart"), {
+      type: "pie",
+      data: {
+        labels: Object.keys(counts),
+        datasets: [{
+          data: Object.values(counts),
+          backgroundColor: ["#36A2EB", "#FFCE56", "#FF6384", "#8BC34A", "#FF9800"]
+        }]
+      }
+    });
+  }
+
+  // Run on page load
+  loadVisitors();
+  loadVehicleChart();
+</script>
+</body>
+</html>

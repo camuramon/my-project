@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entry and Exit Monitoring System - Guard</title>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Guard-specific CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/guard.css') }}">
+
+    <!-- Guard-specific JS -->
+    <script src="{{ url_for('static', filename='js/guard.js') }}"></script>
+    <style>
+        :root {
+            --bg-color: #121213;
+            --card-bg-color: #ffffff;
+            --text-color: #1e293b;
+            --muted-text-color: #64748b;
+            --accent-color: #0ea5e9;
+            --accent-hover: #0284c7;
+            --border-color: #0e010a;
+            --toggle-bg-light: #e2e8f0;
+            --toggle-bg-dark: #374151;
+            --toggle-icon-light: #94a3b8;
+            --toggle-icon-dark: #fde047;
+            --toggle-btn-light: #f1f5f9;
+            --toggle-btn-dark: #1f2937;
+        }
+        body.dark-mode {
+            --bg-color: #111827; /* Updated background color */
+            --card-bg-color: #2d3748;
+            --text-color: #04ca5d;
+            --muted-text-color: #202124;
+            --accent-color: #151616;
+            --accent-hover: #0f0f0f;
+            --border-color: #1c1d1f;
+            --toggle-bg-light: #4b5563;
+            --toggle-bg-dark: #111827;
+            --toggle-icon-light: #6b7280;
+            --toggle-icon-dark: #fde047;
+            --toggle-btn-light: #374151;
+            --toggle-btn-dark: #f1f5f9;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            
+            /* Background image styles */
+            background-image: url('https://images.unsplash.com/photo-1549419356-91e813a34a8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1Njk3MTJ8MHwxfHNlYXJjaHwxfHxzdWJ1cmJhbmlzYXRpb24lMjBjb21tdW5pdHklMjBEYXl8ZW58MHx8fHwxNzIxNzE5NjY4fDA&ixlib=rb-4.0.3&q=80&w=1080');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-blend-mode: overlay;
+        }
+        body.dark-mode {
+            background-image: url('https://images.unsplash.com/photo-1563854189255-b0400b46294d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1Njk3MTJ8MHwxfHNlYXJjaHw1fHxzdWJ1cmJhbmlzYXRpb24lMjBjb21tdW5pdHklMjBOaWdodHxlbnwwfHx8fDE3MjE3MTk2ODd8MA&ixlib=rb-4.0.3&q=80&w=1080');
+            background-color: #111827; /* Updated overlay color */
+        }
+        .card {
+            background-color: var(--card-bg-color);
+            color: var(--text-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        input, select, textarea {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-color);
+        }
+        .btn {
+            background-color: var(--accent-color);
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        .btn-green { background-color: #04ca5d; }
+        .btn-green:hover { background-color: #04ca5d; }
+        .btn-gray { background-color: #0d0d0e; }
+        .btn-gray:hover { background-color: #1d1e1f; }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .input-error {
+            border-color: #ef4444;
+        }
+        .input-error-text {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        @media print {
+            body * { visibility: hidden !important; }
+            #qr-result, #qr-result * { visibility: visible !important; }
+            #qr-result {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding-top: 2rem;
+            }
+            #qr-code canvas {
+                width: 240px !important;
+                height: 240px !important;
+            }
+            .no-print { display: none !important; }
+        }
+        @page { margin: 12mm; }
+
+        /* New styles for the amazing dark mode toggle */
+        #theme-toggle-container {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            border-radius: 16px;
+            background-color: var(--toggle-bg-light);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .dark-mode #theme-toggle-container {
+            background-color: var(--toggle-bg-dark);
+        }
+
+        #theme-toggle-button {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--toggle-btn-light);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .dark-mode #theme-toggle-button {
+            transform: translateX(28px);
+            background-color: var(--toggle-btn-dark);
+        }
+        
+        #theme-toggle-button svg {
+            width: 20px;
+            height: 20px;
+            transition: opacity 0.3s ease;
+        }
+
+        .dark-mode #sun-icon {
+            opacity: 0;
+        }
+
+        .dark-mode #moon-icon {
+            opacity: 1;
+        }
+
+        #moon-icon {
+            opacity: 0;
+            position: absolute; /* To overlap the sun icon */
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 transition-colors duration-500">
+
+    <header class="container mx-auto px-4 py-6 flex justify-between items-center">
+        <div class="flex-grow text-center">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-600 dark:text-cyan-400 tracking-tight">
+    Entry and Exit Monitoring System 🏡
+</h1>
+<p class="mt-2 text-green-700 dark:text-green-300">
+    Secure & efficient visitor tracking with QR technology
+</p>
+        </div>
+        <div class="flex space-x-4 items-center">
+            <div id="theme-toggle-container">
+                <div id="theme-toggle-button">
+                    <svg id="sun-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="text-yellow-500">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.364-1.591 1.591M21 12h-2.25m-.364 6.364-1.591-1.591M12 21v-2.25m-6.364-.364 1.591-1.591M3 12h2.25m-.364-6.364 1.591 1.591M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12Z" />
+                    </svg>
+                    <svg id="moon-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="text-gray-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 12a9.753 9.753 0 0 0 18.752 3.002Z" />
+                    </svg>
+                </div>
+            </div>
+            <button id="logout-button" class="btn btn-gray text-white font-semibold py-2 px-4 rounded-full">
+                Logout
+            </button>
+        </div>
+    </header>
+    <!-- Firebase SDKs -->
+<script type="module">
+  // Import Firebase functions
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+  // ✅ Your Firebase Config (yung binigay mo)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBGMdX3w7flDqee-YqsvSgjIFhmmouxVeU",
+    authDomain: "subdivision-visitor-system.firebaseapp.com",
+    projectId: "subdivision-visitor-system",
+    storageBucket: "subdivision-visitor-system.firebasestorage.app",
+    messagingSenderId: "818390497957",
+    appId: "1:818390497957:web:65916c571af6b940906b4c",
+    measurementId: "G-3823PLXFXS"
+  };
+
+  // ✅ Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Make db accessible to your other scripts
+  window.db = db;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
+</script>
+
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="card p-8 rounded-2xl shadow-xl space-y-6 fade-in">
+                <h2 class="text-2xl font-bold text-slate-500 dark:text-slate-300">Visitor Registration</h2>
+            <form id="registration-form" action="{{ url_for('add_visitor') }}" method="POST">
+                    <div class="space-y-2">
+                        <label class="block text-slate-500 dark:text-slate-300 font-medium">Capture Visitor Photo</label>
+                        <div id="camera" class="w-full aspect-video bg-slate-200 dark:bg-slate-700 rounded-xl overflow-hidden mb-2"></div>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <button type="button" onclick="takeSnapshot()" class="btn btn-green text-white font-semibold py-2 px-4 rounded-full flex-1">
+                                Capture Photo
+                            </button>
+                            <button type="button" onclick="retryPhoto()" class="btn btn-gray text-white font-semibold py-2 px-4 rounded-full flex-1">
+                                Retry
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-slate-500 dark:text-slate-300 font-medium">Photo Preview</label>
+                        <div id="preview" class="w-40 h-40 mx-auto rounded-full overflow-hidden border-4 border-slate-200 dark:border-slate-700">
+                            <img src="https://placehold.co/160x160/cbd5e1/2d3748?text=Photo" alt="Visitor photo placeholder" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="full-name" class="block text-sm font-medium text-slate-500 dark:text-slate-300">Full Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="full-name" class="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. Juan Dela Cruz">
+                        </div>
+                        <div>
+                            <label for="plate-number" class="block text-sm font-medium text-slate-500 dark:text-slate-300">Vehicle Plate Number <span class="text-red-500">*</span></label>
+                            <input type="text" id="plate-number" class="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. ABC 123">
+                        </div>
+                        <div>
+                            <label for="id-type" class="block text-sm font-medium text-slate-500 dark:text-slate-300">ID Type <span class="text-red-500">*</span></label>
+                            <select id="id-type" class="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                <option value="">Select ID Type</option>
+                                <option value="Driver's License">Driver's License</option>
+                                <option value="Passport">Passport</option>
+                                <option value="SSS ID">SSS ID</option>
+                                <option value="UMID">UMID</option>
+                                <option value="Company ID">Company ID</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-500 mb-2">Vehicle Type</label>
+                            <select id="vehicle-type" onchange="toggleVehicleName()" 
+                                class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Vehicle Type</option>
+                                <option value="Car">Car</option>
+                                <option value="Motorcycle">Motorcycle</option>
+                                <option value="Truck">Truck</option>
+                                <option value="Van">Van</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-500 mb-2">Vehicle Name / Model</label>
+                            <input type="text" id="vehicle-name" placeholder="e.g. Toyota Vios / Yamaha NMAX" 
+                                class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="id-number" class="block text-sm font-medium text-slate-500 dark:text-slate-300">ID Number <span class="text-red-500">*</span></label>
+                            <input type="text" id="id-number" class="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. 123456789">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="purpose" class="block text-sm font-medium text-slate-500 dark:text-slate-300">Purpose of Visit <span class="text-red-500">*</span></label>
+                            <textarea id="purpose" rows="3" class="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g. To visit resident Jane Doe at Block 5, Lot 10."></textarea>
+                        </div>
+                        <div>
+                            <label for="visit-date" class="block text-sm font-medium text-slate-500 dark:text-slate-300">Date of Visit <span class="text-red-500">*</span></label>
+                            <input type="date" id="visit-date" class="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        </div>
+                        <div>
+                            <label for="visit-time" class="block text-sm font-medium text-slate-500 dark:text-slate-300">Time of Visit <span class="text-red-500">*</span></label>
+                            <input type="time" id="visit-time" class="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        </div>
+                    </div>
+                     <input type="hidden" name="photo" id="photo-input">
+                    <button type="submit" class="btn w-full text-white font-bold py-3 px-4 rounded-full text-lg shadow-lg">
+                        Register Visitor & Generate QR Code
+                    </button>
+                </form>
+
+                <div id="qr-result" class="mt-6 hidden fade-in">
+                    <h3 class="text-xl font-semibold text-slate-500 dark:text-slate-100 mb-2">Visitor QR Pass</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Show this QR code at the subdivision entrance for scanning.</p>
+                    <div id="qr-code" class="w-48 h-48 mx-auto p-2 bg-white dark:bg-slate-700 rounded-lg shadow-lg flex justify-center items-center"></div>
+                    <div class="mt-4 p-4 bg-sky-50 dark:bg-sky-900/50 rounded-lg">
+                        <p class="text-sky-800 dark:text-sky-200 font-bold">QR Code Details:</p>
+                        <p id="qr-details" class="text-sm text-slate-600 dark:text-slate-300"></p>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 mt-2">
+                            Valid until: <span id="expiry-date" class="font-medium"></span>
+                        </p>
+                    </div>
+                    <button onclick="printQRCode()" class="btn btn-gray w-full mt-4 text-white font-semibold py-3 px-4 rounded-full no-print">
+                        Print QR Code
+                    </button>
+                </div>
+            </div>
+                
+            <div class="card p-8 rounded-2xl shadow-xl space-y-6 fade-in">
+                <h2 class="text-2xl font-bold text-slate-500 dark:text-slate-100">Entrance Scanner</h2>
+                <div id="scanner-container">
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Scan visitor QR code at the entrance for verification.</p>
+                    <div id="scanner-placeholder" class="w-full aspect-video bg-slate-200 dark:bg-slate-700 rounded-xl flex justify-center items-center text-slate-400 dark:text-slate-500">
+                        <p class="text-center p-4">IoT Scanner would be active here in production. Click the button below to simulate.</p>
+                    </div>
+                    <button onclick="simulateScan()" class="btn w-full mt-4 text-white font-semibold py-3 px-4 rounded-full">
+                        Simulate QR Scan (Demo)
+                    </button>
+                </div>
+                
+                <div id="scan-result" class="mt-6 hidden fade-in">
+                    <h3 class="text-xl font-semibold text-slate-500 dark:text-slate-100 mb-4">Visitor Details</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg col-span-2 flex flex-col items-center">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm mb-2">Visitor Photo</p>
+                            <img id="scanned-photo" src="https://placehold.co/160x160/cbd5e1/2d3748?text=Photo" alt="Scanned visitor photo" class="w-32 h-32 rounded-full object-cover border-4 border-slate-200 dark:border-slate-700" />
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-500 rounded-lg">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">Full Name</p>
+                            <p id="scanned-name" class="font-semibold text-lg"></p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">Plate Number</p>
+                            <p id="scanned-plate" class="font-semibold text-lg"></p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">Visit Date</p>
+                            <p id="scanned-date" class="font-semibold"></p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">Visit Time</p>
+                            <p id="scanned-time" class="font-semibold"></p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 rounded-lg" id="validity-status">
+                        <p class="font-bold text-lg"></p>
+                        <p class="text-sm"></p>
+                    </div>
+                    <button onclick="resetScanner()" class="btn btn-gray w-full mt-4 text-white font-semibold py-3 px-4 rounded-full">
+                        Reset Scanner
+                    </button>
+                </div>
+                
+                <div class="mt-8">
+                    <h3 class="text-xl font-bold text-slate-500 dark:text-slate-100 mb-2">Visitor Database</h3>
+                    <div class="overflow-x-auto card p-4 rounded-xl shadow-inner">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b border-slate-200 dark:border-slate-700">
+                                    <th class="py-2 pr-4 font-semibold">Name</th>
+                                    <th class="py-2 pr-4 font-semibold">Plate No.</th>
+                                    <th class="py-2 font-semibold">Valid Until</th>
+                                </tr>
+                            </thead>
+                            <tbody id="visitor-database">
+                                <tr>
+                                    <td class="py-2 pr-4 border-b border-slate-200 dark:border-slate-500 text-slate-600 dark:text-slate-500">Juan Dela Cruz</td>
+                                    <td class="py-2 pr-4 border-b border-slate-200 dark:border-slate-500 text-slate-600 dark:text-slate-500">ABC 123</td>
+                                    <td class="py-2 border-b border-slate-200 dark:border-slate-500 text-slate-600 dark:text-slate-500">Dec 31, 2024</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 pr-4 border-b border-slate-200 dark:border-slate-500 text-slate-600 dark:text-slate-500">Maria Reyes</td>
+                                    <td class="py-2 pr-4 border-b border-slate-200 dark:border-slate-500 text-slate-600 dark:text-slate-500">XYZ 789</td>
+                                    <td class="py-2 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-500">Jan 15, 2025</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button onclick="refreshDatabase()" class="btn w-full mt-4 text-white font-semibold py-3 px-4 rounded-full">
+                        Refresh Database
+                    </button>
+                    <!-- ✅ New Add Walk-in Visitor button -->
+<button onclick="openWalkInForm()" 
+  class="btn btn-green w-full mt-4 text-white font-semibold py-3 px-4 rounded-full">
+  Add Walk-in Visitor
+</button>
+<div id="walkin-form" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg w-96">
+    <h3 class="text-xl font-bold mb-4 text-slate-600 dark:text-slate-200">Add Walk-in Visitor</h3>
+    
+    <input id="walkin-name" type="text" placeholder="Full Name" 
+      class="w-full mb-2 p-2 border rounded">
+
+    <input id="walkin-contact" type="text" placeholder="Contact Number" 
+      class="w-full mb-2 p-2 border rounded">
+
+    <input id="walkin-age" type="number" placeholder="Age" 
+      class="w-full mb-2 p-2 border rounded">
+
+    <input id="walkin-plate" type="text" placeholder="Plate Number" 
+      class="w-full mb-2 p-2 border rounded">
+
+    <input id="walkin-purpose" type="text" placeholder="Purpose of Visit" 
+      class="w-full mb-2 p-2 border rounded">
+
+    <div class="flex gap-2 mt-4">
+      <button onclick="saveWalkInVisitor()" 
+        class="btn btn-green flex-1 text-white py-2 px-4 rounded">Save</button>
+      <button onclick="closeWalkInForm()" 
+        class="btn btn-gray flex-1 text-white py-2 px-4 rounded">Cancel</button>
+    </div>
+  </div>
+</div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <script>
+            // --- Log Out functionality ---
+    document.getElementById('logout-button').addEventListener('click', function() {
+        window.location.href = "/logout";
+    });
+
+    // --- Amazing Dark Mode Toggle UI & Logic ---
+    const themeToggleContainer = document.getElementById('theme-toggle-container');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+
+    const isDarkMode = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        document.body.classList.add('dark-mode');
+    } else {
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark-mode');
+    }
+
+    themeToggleContainer.addEventListener('click', () => {
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+
+    // --- Form Submission and Validation ---
+    document.getElementById('registration-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        registerVisitor();
+    });
+
+    function validateForm() {
+        const requiredFields = ['full-name', 'plate-number', 'id-type', 'id-number', 'purpose', 'visit-date', 'visit-time'];
+        let isValid = true;
+
+        requiredFields.forEach(id => {
+            const input = document.getElementById(id);
+            if (input.value.trim() === '') {
+                input.classList.add('input-error');
+                isValid = false;
+            } else {
+                input.classList.remove('input-error');
+            }
+        });
+
+        const photoData = document.querySelector('#preview img').src;
+        if (photoData.includes('placehold.co')) {
+            alert('Please capture a visitor photo!');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    // --- Core Application Logic ---
+    Webcam.set({
+        width: 320,
+        height: 240,
+        image_format: 'jpeg',
+        jpeg_quality: 90
+    });
+    Webcam.attach('#camera');
+
+    let currentVisitor = null;
+    let visitors = []; // Store visitors in a local array for the demo
+
+    function takeSnapshot() {
+        Webcam.snap(function(data_uri) {
+            document.getElementById('preview').innerHTML = `<img src="${data_uri}" class="w-full h-full object-cover">`;
+            document.getElementById('photo-input').value = data_uri;
+            document.getElementById('camera').style.display = 'none'; // Hide camera feed after snapshot
+        });
+    }
+
+    function retryPhoto() {
+        document.getElementById('preview').innerHTML =
+            `<img src="https://placehold.co/160x160/cbd5e1/2d3748?text=Photo" alt="Visitor photo placeholder" class="w-full h-full object-cover">`;
+        document.getElementById('photo-input').value = '';
+        document.getElementById('camera').style.display = 'block'; // Show camera feed for retry
+        Webcam.attach('#camera'); // Re-attach camera
+    }
+
+    function registerVisitor() {
+        if (!validateForm()) {
+            alert('Please fill all required fields correctly!');
+            return;
+        }
+
+        const fullName = document.getElementById('full-name').value;
+        const plateNumber = document.getElementById('plate-number').value;
+        const idType = document.getElementById('id-type').value;
+        const idNumber = document.getElementById('id-number').value;
+        const purpose = document.getElementById('purpose').value;
+        const visitDate = document.getElementById('visit-date').value;
+        const visitTime = document.getElementById('visit-time').value;
+        const vehicleType = document.getElementById('vehicle-type').value; // Added
+        const vehicleName = document.getElementById('vehicle-name').value; // Added
+        const photoData = document.querySelector('#preview img').src;
+
+        currentVisitor = {
+            fullName,
+            plateNumber,
+            idType,
+            idNumber,
+            purpose,
+            visitDate,
+            visitTime,
+            vehicleType,
+            vehicleName,
+            photo: photoData,
+            registrationDate: new Date().toISOString()
+        };
+
+        const today = new Date();
+        const expiryDate = new Date(today.setFullYear(today.getFullYear() + 1));
+        currentVisitor.expiryDate = expiryDate.toISOString();
+
+        const qrData = JSON.stringify({
+            id: generateVisitorId(),
+            name: fullName,
+            plate: plateNumber,
+            expiry: expiryDate.toISOString()
+        });
+
+        const qrContainer = document.getElementById('qr-code');
+        qrContainer.innerHTML = "";
+        const canvas = document.createElement("canvas");
+        qrContainer.appendChild(canvas);
+
+        QRCode.toCanvas(canvas, qrData, {
+            width: 180,
+            margin: 1,
+            color: {
+                dark: '#1E40AF',
+                light: '#ffffff'
+            }
+        }, function(error) {
+            if (error) console.error(error);
+        });
+
+        document.getElementById('qr-details').textContent =
+            `Name: ${fullName} | Plate: ${plateNumber}`;
+
+        document.getElementById('expiry-date').textContent =
+            expiryDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        document.getElementById('qr-result').classList.remove('hidden');
+
+        addToDatabase(currentVisitor);
+    }
+
+    function generateVisitorId() {
+        return 'VID-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    }
+
+    // Function to add a visitor to the local array and update the table
+    function addToDatabase(visitor) {
+        visitors.unshift(visitor); // Add to the beginning of the array
+        refreshDatabase();
+    }
+
+    function printQRCode() {
+        const section = document.getElementById('qr-result');
+        if (section.classList.contains('hidden')) {
+            alert('Please generate a QR code before printing.');
+            return;
+        }
+        window.print();
+    }
+
+    function simulateScan() {
+        if (!currentVisitor) {
+            alert('No visitor data available. Please register a visitor first.');
+            return;
+        }
+
+        // Display photo and visitor details from the latest registered visitor
+        document.getElementById('scanned-photo').src = currentVisitor.photo;
+        document.getElementById('scanned-name').textContent = currentVisitor.fullName;
+        document.getElementById('scanned-plate').textContent = currentVisitor.plateNumber;
+        document.getElementById('scanned-date').textContent = new Date(currentVisitor.visitDate).toLocaleDateString() || '-';
+        document.getElementById('scanned-time').textContent = currentVisitor.visitTime || '-';
+        document.getElementById('scanned-vehicle-type').textContent = currentVisitor.vehicleType || 'N/A';
+        document.getElementById('scanned-vehicle-name').textContent = currentVisitor.vehicleName || 'N/A';
+
+        const expiry = new Date(currentVisitor.expiryDate);
+        const today = new Date();
+        const validityStatus = document.getElementById('validity-status');
+
+        if (expiry > today) {
+            validityStatus.innerHTML = `
+                <p class="font-bold text-green-600 dark:text-green-400">VALID QR CODE</p>
+                <p class="text-sm text-green-500 dark:text-green-300">Expires on: ${expiry.toLocaleDateString()}</p>
+            `;
+            validityStatus.className = 'mt-4 p-4 bg-green-50 dark:bg-green-900/50 rounded-lg';
+        } else {
+            validityStatus.innerHTML = `
+                <p class="font-bold text-red-600 dark:text-red-400">EXPIRED QR CODE</p>
+                <p class="text-sm text-red-500 dark:text-red-300">Expired on: ${expiry.toLocaleDateString()}</p>
+            `;
+            validityStatus.className = 'mt-4 p-4 bg-red-50 dark:bg-red-900/50 rounded-lg';
+        }
+
+        document.getElementById('scanner-container').classList.add('hidden');
+        document.getElementById('scan-result').classList.remove('hidden');
+    }
+
+    function resetScanner() {
+        document.getElementById('scan-result').classList.add('hidden');
+        document.getElementById('scanner-container').classList.remove('hidden');
+    }
+
+    // Function to add a walk-in visitor
+    function openWalkInForm() {
+        document.getElementById('walkin-form').classList.remove('hidden');
+    }
+
+    function closeWalkInForm() {
+        document.getElementById('walkin-form').classList.add('hidden');
+    }
+
+    function saveWalkInVisitor() {
+        const name = document.getElementById('walkin-name').value;
+        const plate = document.getElementById('walkin-plate').value;
+        const purpose = document.getElementById('walkin-purpose').value;
+        const contact = document.getElementById('walkin-contact').value;
+        const age = document.getElementById('walkin-age').value;
+
+        if (!name) {
+            alert('Full Name is required for a walk-in visitor.');
+            return;
+        }
+
+        const newWalkInVisitor = {
+            fullName: name,
+            plateNumber: plate || 'N/A',
+            purpose: purpose || 'N/A',
+            contact: contact || 'N/A',
+            age: age || 'N/A',
+            photo: 'https://placehold.co/160x160/cbd5e1/2d3748?text=Walk-in',
+            registrationDate: new Date().toISOString(),
+            expiryDate: new Date(new Date().getTime() + 12 * 60 * 60 * 1000).toISOString()
+        };
+
+        visitors.unshift(newWalkInVisitor); // Add to the beginning of the array
+        closeWalkInForm();
+        refreshDatabase();
+        alert('Walk-in visitor added successfully!');
+    }
+
+    // Function to refresh the visitor database table from the local array
+    function refreshDatabase() {
+        const dbTable = document.getElementById('visitor-database');
+        dbTable.innerHTML = '';
+        visitors.forEach(visitor => {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="py-2 pr-4 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">${visitor.fullName}</td>
+                <td class="py-2 pr-4 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">${visitor.plateNumber}</td>
+                <td class="py-2 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">${new Date(visitor.expiryDate).toLocaleDateString('en-US')}</td>
+            `;
+            dbTable.appendChild(newRow);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date();
+        document.getElementById('visit-date').value = today.toISOString().split('T')[0];
+
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        document.getElementById('visit-time').value = `${hours}:${minutes}`;
+        
+        // Initial sample data for the table
+        visitors = [
+            {
+                fullName: 'Juan Dela Cruz',
+                plateNumber: 'ABC 123',
+                expiryDate: '2025-12-31T00:00:00.000Z',
+                photo: 'https://placehold.co/160x160/cbd5e1/2d3748?text=Juan',
+                visitDate: '2025-09-17',
+                visitTime: '10:00',
+                vehicleType: 'Car',
+                vehicleName: 'Toyota Vios'
+            },
+            {
+                fullName: 'Maria Reyes',
+                plateNumber: 'XYZ 789',
+                expiryDate: '2026-01-15T00:00:00.000Z',
+                photo: 'https://placehold.co/160x160/cbd5e1/2d3748?text=Maria',
+                visitDate: '2025-09-17',
+                visitTime: '10:15',
+                vehicleType: 'Motorcycle',
+                vehicleName: 'Yamaha NMAX'
+            }
+        ];
+        refreshDatabase(); // Populate the table on page load
+    });
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            document.getElementById('visit-date').value = today.toISOString().split('T')[0];
+            
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('visit-time').value = `${hours}:${minutes}`;
+        });
+    </script>
+    
+</body>
+</html>

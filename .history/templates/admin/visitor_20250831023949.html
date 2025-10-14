@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cypress Admin Dashboard - Visitors</title>
+  <style>
+    /* Reset and base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+      display: flex;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+    /* Scrollbar for sidebar and main content */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #444;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background-color: #1b1b1b;
+    }
+
+    /* Sidebar */
+    nav.sidebar {
+      background-color: #1b1b1b;
+      width: 250px;
+      height: 100vh;
+      padding: 2rem 1.5rem 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
+    }
+    .sidebar .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 0;
+    }
+    .sidebar .logo-icon {
+      background-color: #28a745;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 20px;
+      color: #121212;
+      user-select: none;
+      font-family: monospace, monospace;
+    }
+    .sidebar .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .sidebar .logo-text .brand {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #ffffff;
+    }
+    .sidebar .logo-text .tagline {
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: #bbbbbb;
+      margin-top: 2px;
+    }
+    .sidebar ul.nav-menu {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      font-size: 0.95rem;
+      line-height: 1.3;
+      user-select: none;
+    }
+    .sidebar ul.nav-menu li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #bbbbbb;
+      transition: color 0.2s ease-in-out;
+    }
+    .sidebar ul.nav-menu li.active,
+    .sidebar ul.nav-menu li:hover {
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .sidebar ul.nav-menu li .icon {
+      font-size: 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      user-select: none;
+    }
+
+    /* Header bar */
+    header.header-bar {
+      position: fixed;
+      top: 0;
+      left: 250px;
+      right: 0;
+      height: 60px;
+      background-color: #1b1b1b;
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      gap: 1rem;
+      color: #e0e0e0;
+      z-index: 10;
+    }
+    header.header-bar input.search-global {
+      flex-grow: 1;
+      max-width: 450px;
+      background-color: #222222;
+      border-radius: 8px;
+      border: none;
+      padding: 8px 14px;
+      font-size: 0.95rem;
+      color: #ddd;
+      transition: background-color 0.25s ease;
+    }
+    header.header-bar input.search-global::placeholder {
+      color: #666;
+    }
+    header.header-bar input.search-global:focus {
+      outline: none;
+      background-color: #2a2a2a;
+      color: #fff;
+    }
+    .header-icons {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .header-icons button {
+      position: relative;
+      background-color: transparent;
+      border-radius: 50%;
+      padding: 8px 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease-in-out;
+      color: #ddd;
+    }
+    .header-icons button:hover {
+      background-color: #333333;
+      color: #fff;
+    }
+    .header-icons .notification {
+      position: relative;
+      font-size: 1.3rem;
+    }
+    .header-icons .notification-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background-color: #dc3545;
+      color: white;
+      font-size: 9px;
+      padding: 1.5px 5px;
+      border-radius: 9999px;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    /* Main Content Area */
+    main.content {
+      margin-left: 250px;
+      margin-top: 60px;
+      padding: 2rem 2rem 3rem 2rem;
+      overflow-y: auto;
+      height: calc(100vh - 60px);
+    }
+    main.content h1.page-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.2rem 0;
+      color: #fff;
+    }
+    main.content p.page-subtitle {
+      margin: 0 0 1.8rem 0;
+      font-weight: 400;
+      color: #a0a0a0;
+      font-size: 0.9rem;
+    }
+
+    /* Controls Container */
+    .main-controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 8px 14px;
+      user-select: none;
+      transition: background-color 0.25s ease;
+    }
+    .btn-filter {
+      background-color: transparent;
+      color: #bbb;
+      border: 1.5px solid #444;
+    }
+    .btn-filter:hover, .btn-filter:focus {
+      background-color: #333;
+      border-color: #28a745;
+      color: #e0e0e0;
+      outline: none;
+    }
+    .btn-export {
+      background-color: transparent;
+      border: 1.5px solid #444;
+      color: #bbb;
+    }
+    .btn-export:hover, .btn-export:focus {
+      background-color: #333;
+      border-color: #17a2b8;
+      color: #e0e0e0;
+      outline: none;
+    }
+    .btn-register {
+      background-color: #28a745;
+      color: #121212;
+      border: none;
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+    .btn-register:hover, .btn-register:focus {
+      background-color: #219638;
+      outline: none;
+    }
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* Search box & QR Select container */
+    .search-filter-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .search-filter-bar input[type="search"] {
+      flex-grow: 1;
+      min-width: 280px;
+      background-color: #222222;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 0.95rem;
+      color: #ddd;
+      transition: background-color 0.25s ease;
+    }
+    .search-filter-bar input[type="search"]::placeholder {
+      color: #666;
+    }
+    .search-filter-bar input[type="search"]:focus {
+      outline: none;
+      background-color: #2a2a2a;
+      color: #fff;
+    }
+    .search-filter-bar select {
+      min-width: 150px;
+      background-color: #222222;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      color: #ddd;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #bbb 50%),
+        linear-gradient(135deg, #bbb 50%, transparent 50%),
+        linear-gradient(to right, #444, #444);
+      background-position:
+        calc(100% - 20px) calc(50% - 3px),
+        calc(100% - 15px) calc(50% - 3px),
+        calc(100% - 25px) 50%;
+      background-size: 5px 5px, 5px 5px, 1px 1px;
+      background-repeat: no-repeat;
+    }
+    .search-filter-bar select:hover, .search-filter-bar select:focus {
+      background-color: #2a2a2a;
+      outline: none;
+    }
+
+    /* Visitor Log Table */
+    table.visitor-log {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 0.8rem;
+      font-size: 0.9rem;
+      color: #ddd;
+    }
+    table.visitor-log thead {
+      color: #bbb;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-bottom: 1.5px solid #333;
+    }
+    table.visitor-log th, table.visitor-log td {
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+    table.visitor-log th:last-child,
+    table.visitor-log td:last-child {
+      text-align: center;
+      width: 80px;
+    }
+    table.visitor-log tbody tr {
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      box-shadow: 0 0 5px 0 #111;
+      transition: background-color 0.2s ease;
+      display: table-row;
+      border: none;
+    }
+    table.visitor-log tbody tr:hover {
+      background-color: #292929;
+    }
+
+    /* VisitorID column */
+    td.visitor-id {
+      font-family: monospace;
+      color: #999;
+      font-size: 0.85rem;
+      width: 70px;
+      padding-top: 14px;
+    }
+
+    /* Visitor Name column */
+    td.visitor-name {
+      font-weight: 700;
+      color: #fff;
+      width: 140px;
+      padding-top: 12px;
+      line-height: 1.3;
+    }
+    /* Vehicle & ID column with nested lines */
+    td.vehicle-id {
+      line-height: 1.3;
+      color: #ddd;
+      width: 200px;
+    }
+    td.vehicle-id strong {
+      font-weight: 700;
+    }
+    td.vehicle-id small {
+      display: block;
+      font-weight: 400;
+      font-size: 0.82rem;
+      color: #999999;
+      margin-top: 3px;
+    }
+
+    /* Purpose column */
+    td.purpose {
+      width: 130px;
+      padding-top: 12px;
+      color: #ddd;
+    }
+    /* Host resident */
+    td.host-resident {
+      width: 145px;
+      color: #ddd;
+      padding-top: 12px;
+      line-height: 1.3;
+      font-weight: 600;
+    }
+    /* Visit time with multiple lines and icon */
+    td.visit-time {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #ccc;
+      width: 100px;
+      line-height: 1.2;
+      font-family: monospace;
+      padding-top: 12px;
+    }
+    td.visit-time .time-label {
+      color: #999;
+      font-weight: 400;
+      font-size: 0.75rem;
+    }
+    td.visit-time svg.clock-icon {
+      vertical-align: middle;
+      width: 14px;
+      height: 14px;
+      stroke: #999;
+      stroke-width: 1.5;
+      margin-right: 3px;
+      fill: none;
+    }
+
+    /* Status badges container */
+    td.visit-status,
+    td.qr-status {
+      width: 90px;
+      padding-top: 12px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+      user-select: none;
+      min-width: 70px;
+      max-width: 100%;
+      white-space: nowrap;
+    }
+    .badge.active-visit {
+      background-color: #1a2a56;
+      color: #4ea1fc;
+      border: 1.5px solid #4ea1fc;
+    }
+    .badge.checked-out {
+      background-color: #333333;
+      color: #9a9691;
+      border: 1.5px solid #666666;
+    }
+    .badge.expired {
+      background-color: #503f00;
+      color: #d6bc05;
+      border: 1.5px solid #d6bc05;
+    }
+    .badge.valid {
+      background-color: #145214;
+      color: #72d672;
+      border: 1.5px solid #72d672;
+      min-width: 48px;
+    }
+
+    /* Actions column */
+    td.actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding-top: 14px;
+    }
+    td.actions button {
+      background: transparent;
+      color: #999;
+      padding: 6px 6px;
+      border-radius: 6px;
+      transition: color 0.15s ease-in-out;
+    }
+    td.actions button:hover {
+      color: #fff;
+      background-color: #333;
+    }
+    /* Icons inside actions */
+    td.actions button svg {
+      height: 16px;
+      width: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1100px) {
+      nav.sidebar {
+        width: 200px;
+      }
+      header.header-bar {
+        left: 200px;
+      }
+      main.content {
+        margin-left: 200px;
+      }
+      .btn {
+        font-size: 0.85rem;
+        padding: 7px 12px;
+      }
+      .search-filter-bar input[type="search"] {
+        min-width: 200px;
+      }
+    }
+    @media (max-width: 720px) {
+      nav.sidebar {
+        position: fixed;
+        width: 60px;
+        padding: 1.5rem 0.5rem 1rem 0.5rem;
+        overflow-x: visible;
+      }
+      nav.sidebar .logo-text {
+        display: none;
+      }
+      nav.sidebar ul.nav-menu li {
+        justify-content: center;
+        font-weight: normal;
+        font-size: 0;
+      }
+      nav.sidebar ul.nav-menu li.active,
+      nav.sidebar ul.nav-menu li:hover {
+        font-weight: normal;
+        font-size: 0;
+        color: #28a745;
+      }
+      nav.sidebar ul.nav-menu li .icon {
+        font-size: 20px;
+        color: #bbb;
+      }
+      nav.sidebar ul.nav-menu li.active .icon,
+      nav.sidebar ul.nav-menu li:hover .icon {
+        color: #28a745;
+      }
+      header.header-bar {
+        left: 60px;
+      }
+      main.content {
+        margin-left: 60px;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .main-controls {
+        justify-content: center;
+      }
+      .search-filter-bar {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .search-filter-bar select {
+        width: 100%;
+      }
+      .search-filter-bar input[type="search"] {
+        width: 100%;
+        min-width: unset;
+      }
+      table.visitor-log thead {
+        display: none;
+      }
+      table.visitor-log tbody tr {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 8px 16px;
+        padding: 14px 12px;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+      }
+      table.visitor-log tbody tr:hover {
+        background-color: #292929;
+      }
+      table.visitor-log tbody tr td {
+        padding: 0;
+        text-align: left;
+        display: block;
+      }
+      td.visitor-id {
+        grid-column: 1 / 2;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #999;
+        padding-top: 0;
+        margin-bottom: 4px;
+      }
+      td.visitor-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 10px;
+        grid-column: 1 / 2;
+      }
+      td.vehicle-id, td.purpose, td.host-resident, td.visit-time, td.visit-status, td.qr-status {
+        font-size: 0.9rem;
+        font-weight: 400;
+        margin-bottom: 6px;
+        color: #ccc;
+      }
+      td.vehicle-id strong,
+      td.vehicle-id small,
+      td.purpose,
+      td.host-resident,
+      td.visit-time,
+      td.visit-status,
+      td.qr-status {
+        display: block;
+      }
+      td.vehicle-id small {
+        color: #888;
+        margin-top: 3px;
+      }
+      td.visit-time, td.visit-status, td.qr-status {
+        grid-column: 2 / 3;
+        margin-bottom: 8px;
+      }
+      td.actions {
+        grid-column: 2 / 3;
+        justify-content: flex-start;
+        gap: 16px;
+        margin-top: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar" aria-label="Primary Navigation">
+    <a href="#" class="logo" tabindex="0" aria-label="Cypress Admin Dashboard homepage">
+      <div class="logo-icon" aria-hidden="true">C</div>
+      <div class="logo-text">
+        <span class="brand">Cypress</span>
+        <span class="tagline">Admin Dashboard</span>
+      </div>
+    </a>
+    <ul class="nav-menu" role="menu" aria-orientation="vertical">
+      <li role="menuitem" tabindex="0" aria-current="page" class="active">
+        <span class="icon" aria-hidden="true">🏠</span>
+        <span>Dashboard</span>
+      </li>
+      <li role="menuitem" tabindex="0">
+        <span class="icon" aria-hidden="true">👨‍👩‍👧‍👦</span>
+        <span>Residents</span>
+      </li>
+      <li role="menuitem" tabindex="0">
+        <span class="icon" aria-hidden="true">🚶‍♂️</span>
+        <span>Visitors</span>
+      </li>
+      <li role="menuitem" tabindex="0">
+        <span class="icon" aria-hidden="true">🔳</span>
+        <span>QR Codes</span>
+      </li>
+      <li role="menuitem" tabindex="0">
+        <span class="icon" aria-hidden="true">📊</span>
+        <span>Reports</span>
+      </li>
+      <li role="menuitem" tabindex="0">
+        <span class="icon" aria-hidden="true">⚙️</span>
+        <span>Settings</span>
+      </li>
+    </ul>
+  </nav>
+  <header class="header-bar" role="banner">
+    <input
+      type="search"
+      class="search-global"
+      placeholder="Search residents, visitors, plates..."
+      aria-label="Global search residents, visitors, and plates"
+      spellcheck="false"
+    />
+    <div class="header-icons">
+      <button aria-label="View notifications" title="Notifications" class="notification" tabindex="0">
+        <svg aria-hidden="true" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span class="notification-badge" aria-live="polite" aria-atomic="true">3</span>
+      </button>
+      <button aria-label="User profile" title="User profile" tabindex="0">
+        <svg aria-hidden="true" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <circle cx="12" cy="7" r="4"></circle>
+          <path d="M5.5 21a8.38 8.38 0 0 1 13 0"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+  <main class="content" role="main" aria-label="Visitors Section">
+    <h1 class="page-title">Visitors</h1>
+    <p class="page-subtitle">Track and manage visitor access</p>
+    <div class="main-controls" role="region" aria-label="Table action controls">
+      <button class="btn btn-filter" type="button" aria-label="Filter visitors">
+        <svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M10 18h4v-2h-4v2zm-7-8v2h18v-2H3zm3-6v2h12V4H6z"/>
+        </svg>
+        Filter
+      </button>
+      <button class="btn btn-export" type="button" aria-label="Export visitor data">
+        <svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M5 17h14v2H5v-2zm7-14v12l4-4h-3v-8h-2zm-4 4v6H5v-6h3z"/>
+        </svg>
+        Export
+      </button>
+      <button class="btn btn-register" type="button" aria-label="Register new visitor">
+        + Register Visitor
+      </button>
+    </div>
+
+    <div class="search-filter-bar">
+      <input
+        type="search"
+        placeholder="Search by name, plate number, purpose, or host..."
+        aria-label="Search visitors by name, plate number, purpose or host"
+        spellcheck="false"
+      />
+      <select aria-label="Filter by QR Code Status">
+        <option>All QR Codes</option>
+        <option>Valid</option>
+        <option>Expired</option>
+        <option>Invalid</option>
+      </select>
+    </div>
+
+    <section aria-label="Visitor Log">
+      <h2 style="margin-bottom: 1rem; font-weight: 700; font-size: 1.2rem; color: #fff;">Visitor Log (5)</h2>
+      <table class="visitor-log" role="table" aria-describedby="desc-visitorlog">
+        <thead>
+          <tr>
+            <th scope="col">Visitor ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Vehicle &amp; ID</th>
+            <th scope="col">Purpose</th>
+            <th scope="col">Host Resident</th>
+            <th scope="col">Visit Time</th>
+            <th scope="col">Visit Status</th>
+            <th scope="col">QR Status</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="visitor-id" data-label="Visitor ID">V001</td>
+            <td class="visitor-name" data-label="Name">Jennifer Anne Lopez</td>
+            <td class="vehicle-id" data-label="Vehicle &amp; ID">
+              <strong>Sedan - MNO 1357</strong><br />
+              <small>Driver's License: D12-34-567890</small>
+            </td>
+            <td class="purpose" data-label="Purpose">Family Visit</td>
+            <td class="host-resident" data-label="Host Resident">John Michael Santos</td>
+            <td class="visit-time" data-label="Visit Time" title="Visit Time details">
+              <svg class="clock-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"></circle>
+                <line x1="12" y1="6" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+                <line x1="12" y1="12" x2="16" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+              </svg>
+              <span class="time-label">In:</span> <br /><strong>14:30</strong>
+            </td>
+            <td class="visit-status" data-label="Visit Status">
+              <span class="badge active-visit">Active Visit</span>
+            </td>
+            <td class="qr-status" data-label="QR Status">
+              <span class="badge valid">Valid</span>
+            </td>
+            <td class="actions" data-label="Actions">
+              <button aria-label="View visitor"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+              <button aria-label="Edit visitor"><svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg></button>
+              <button aria-label="Delete visitor"><svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6v12a2 2 0 0 0 4 0V6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6l1-2h12l1 2"></path></svg></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="visitor-id" data-label="Visitor ID">V002</td>
+            <td class="visitor-name" data-label="Name">Mark Anthony Garcia</td>
+            <td class="vehicle-id" data-label="Vehicle &amp; ID">
+              <strong>Motorcycle - PQR 9999</strong><br />
+              <small>National ID: N987-654-321</small>
+            </td>
+            <td class="purpose" data-label="Purpose">Delivery</td>
+            <td class="host-resident" data-label="Host Resident">Maria Clara Dela Cruz</td>
+            <td class="visit-time" data-label="Visit Time" title="Visit Time details">
+              <svg class="clock-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"></circle>
+                <line x1="12" y1="6" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+                <line x1="12" y1="12" x2="16" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+              </svg>
+              <span class="time-label">In:</span> <br />
+              <strong>09:15</strong><br />
+              <span class="time-label">Out:</span> <br /><strong>09:45</strong>
+            </td>
+            <td class="visit-status" data-label="Visit Status">
+              <span class="badge checked-out">Checked Out</span>
+            </td>
+            <td class="qr-status" data-label="QR Status">
+              <span class="badge valid">Valid</span>
+            </td>
+            <td class="actions" data-label="Actions">
+              <button aria-label="View visitor"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+              <button aria-label="Edit visitor"><svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg></button>
+              <button aria-label="Delete visitor"><svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6v12a2 2 0 0 0 4 0V6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6l1-2h12l1 2"></path></svg></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="visitor-id" data-label="Visitor ID">V003</td>
+            <td class="visitor-name" data-label="Name">Sarah Jane Villareal</td>
+            <td class="vehicle-id" data-label="Vehicle &amp; ID">
+              <strong>SUV - STU 4680</strong><br />
+              <small>Passport: P123456789</small>
+            </td>
+            <td class="purpose" data-label="Purpose">Business Meeting</td>
+            <td class="host-resident" data-label="Host Resident">Roberto Cruz Martinez</td>
+            <td class="visit-time" data-label="Visit Time" title="Visit Time details">
+              <svg class="clock-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"></circle>
+                <line x1="12" y1="6" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+                <line x1="12" y1="12" x2="16" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+              </svg>
+              <span class="time-label">In:</span> <br />
+              <strong>10:00</strong><br />
+              <span class="time-label">Out:</span> <br /><strong>12:30</strong>
+            </td>
+            <td class="visit-status" data-label="Visit Status">
+              <span class="badge checked-out">Checked Out</span>
+            </td>
+            <td class="qr-status" data-label="QR Status">
+              <span class="badge expired">Expired</span>
+            </td>
+            <td class="actions" data-label="Actions">
+              <button aria-label="View visitor"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+              <button aria-label="Edit visitor"><svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg></button>
+              <button aria-label="Delete visitor"><svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6v12a2 2 0 0 0 4 0V6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6l1-2h12l1 2"></path></svg></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="visitor-id" data-label="Visitor ID">V004</td>
+            <td class="visitor-name" data-label="Name">David Miguel Torres</td>
+            <td class="vehicle-id" data-label="Vehicle &amp; ID">
+              <strong>Van - VWX 1122</strong><br />
+              <small>Company ID: C987-123-456</small>
+            </td>
+            <td class="purpose" data-label="Purpose">Maintenance Service</td>
+            <td class="host-resident" data-label="Host Resident">Ana Beatriz Reyes</td>
+            <td class="visit-time" data-label="Visit Time" title="Visit Time details">
+              <svg class="clock-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"></circle>
+                <line x1="12" y1="6" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+                <line x1="12" y1="12" x2="16" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+              </svg>
+              <span class="time-label">In:</span> <br /><strong>08:00</strong>
+            </td>
+            <td class="visit-status" data-label="Visit Status">
+              <span class="badge active-visit">Active Visit</span>
+            </td>
+            <td class="qr-status" data-label="QR Status">
+              <span class="badge valid">Valid</span>
+            </td>
+            <td class="actions" data-label="Actions">
+              <button aria-label="View visitor"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+              <button aria-label="Edit visitor"><svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg></button>
+              <button aria-label="Delete visitor"><svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6v12a2 2 0 0 0 4 0V6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6l1-2h12l1 2"></path></svg></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="visitor-id" data-label="Visitor ID">V005</td>
+            <td class="visitor-name" data-label="Name">Lisa Marie Gonzales</td>
+            <td class="vehicle-id" data-label="Vehicle &amp; ID">
+              <strong>Hatchback - YZA 3344</strong><br />
+              <small>Driver's License: D98-76-543210</small>
+            </td>
+            <td class="purpose" data-label="Purpose">Social Visit</td>
+            <td class="host-resident" data-label="Host Resident">Carlos Eduardo Silva</td>
+            <td class="visit-time" data-label="Visit Time" title="Visit Time details">
+              <svg class="clock-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"></circle>
+                <line x1="12" y1="6" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+                <line x1="12" y1="12" x2="16" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+              </svg>
+              <span class="time-label">In:</span> <br /><strong>16:45</strong>
+            </td>
+            <td class="visit-status" data-label="Visit Status">
+              <span class="badge active-visit">Active Visit</span>
+            </td>
+            <td class="qr-status" data-label="QR Status">
+              <span class="badge valid">Valid</span>
+            </td>
+            <td class="actions" data-label="Actions">
+              <button aria-label="View visitor"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+              <button aria-label="Edit visitor"><svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg></button>
+              <button aria-label="Delete visitor"><svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6v12a2 2 0 0 0 4 0V6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M5 6l1-2h12l1 2"></path></svg></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p id="desc-visitorlog" class="sr-only">Table contains visitor records with visitor ID, name, vehicle information, purpose, host, visit time, visit and QR code status, and action buttons.</p>
+    </section>
+  </main>
+</body>
+</html>
+

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cypress Admin Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore.js"></script>
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="icon">🛡️</div>
+      <div class="title">
+        <h2>Cypress</h2>
+        <span>Admin Dashboard</span>
+      </div>
+    </div>
+    <nav>
+      <ul class="sidebar-menu">
+        <li class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">
+          <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_residents') %}active{% endif %}">
+          <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_visitors') %}active{% endif %}">
+          <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_qr') %}active{% endif %}">
+          <a href="{{ url_for('admin_qr') }}"><span class="icon">🔲</span> QR Codes</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_reports') %}active{% endif %}">
+          <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_settings') %}active{% endif %}">
+          <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+        </li>
+        <li class="active">
+          <a href="#"><span class="icon">🚗</span> Register Vehicle</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="search-bar">
+        <input type="search" placeholder="Search residents, visitors, plates..." />
+      </div>
+      <div class="top-icons">
+        <button class="icon-btn">🔔<span class="notification-count">{{ notifications|length }}</span></button>
+        <button class="icon-btn">👤</button>
+         <button id="logout-button" class="btn btn-gray text-white font-semibold py-2 px-4 rounded-full">
+                Logout
+         </button>
+      </div>
+    </header>
+
+    <section class="dashboard-header">
+      <h1>Dashboard</h1>
+      <h2>Welcome to Cypress Subdivision Admin Panel</h2>
+      <div class="actions">
+        <button class="filter-btn">Filter</button>
+        <button class="export-btn">Export</button>
+      </div>
+    </section>
+
+    <!-- Vehicle Registration Section -->
+    <section class="register-vehicle">
+      <h2>Register Vehicle</h2>
+      <form id="vehicleForm">
+        <input type="text" id="ownerName" placeholder="Owner Name" required />
+        <input type="text" id="plateNumber" placeholder="Plate Number" required />
+        <select id="vehicleType" required>
+          <option value="">Select Type</option>
+          <option value="Car">Car</option>
+          <option value="Motorcycle">Motorcycle</option>
+          <option value="Bicycle">Bicycle</option>
+          <option value="Other">Other</option>
+        </select>
+        <button type="submit">Register</button>
+      </form>
+    </section>
+
+    <!-- Registered Vehicles Table -->
+    <section class="tables-section">
+      <div class="table-container">
+        <h3>Registered Vehicles</h3>
+        <table id="vehicleTable">
+          <thead>
+            <tr>
+              <th>Owner</th>
+              <th>Plate Number</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody id="vehicleList"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="charts">
+      <div class="chart-container">
+        <h3>Visitor Vehicle Distribution</h3>
+        <canvas id="vehicleChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Residents vs Visitors</h3>
+        <canvas id="resVsVisitorsChart"></canvas>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Chart.js Scripts -->
+<script>
+  // --- Log Out functionality ---
+  document.getElementById('logout-button').addEventListener('click', function() {
+    window.location.href = "/logout";
+  });
+
+  // Vehicle Chart (Pie)
+  const vehicleChart = new Chart(document.getElementById("vehicleChart"), {
+    type: "pie",
+    data: {
+      labels: ["Car", "Motorcycle", "Bicycle", "Other"],
+      datasets: [{
+        data: [12, 19, 3, 5], // sample data, replace with Firebase data
+        backgroundColor: ["#36A2EB", "#FFCE56", "#FF6384", "#8BC34A"]
+      }]
+    }
+  });
+
+  // Residents vs Visitors (Bar)
+  const resVsVisitorsChart = new Chart(document.getElementById("resVsVisitorsChart"), {
+    type: "bar",
+    data: {
+      labels: ["Residents", "Visitors"],
+      datasets: [{
+        label: "Count",
+        data: [{{ total_residents }}, {{ active_visitors }}],
+        backgroundColor: ["#42A5F5", "#66BB6A"]
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  }); 
+</script>
+
+<!-- Firebase Vehicle Script -->
+<script>
+  // --- Firebase Config (palitan mo values neto galing sa Firebase project mo) ---
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
+  };
+
+  // Init Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // --- Add Vehicle ---
+  document.getElementById("vehicleForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const owner = document.getElementById("ownerName").value;
+    const plate = document.getElementById("plateNumber").value;
+    const type = document.getElementById("vehicleType").value;
+
+    await db.collection("vehicles").add({
+      ownerName: owner,
+      plateNumber: plate,
+      vehicleType: type,
+      createdAt: new Date()
+    });
+
+    alert("✅ Vehicle registered!");
+    document.getElementById("vehicleForm").reset();
+    loadVehicles();
+  });
+
+  // --- Load Vehicles from Firebase ---
+  async function loadVehicles() {
+    const snapshot = await db.collection("vehicles").orderBy("createdAt", "desc").get();
+    const vehicleList = document.getElementById("vehicleList");
+    vehicleList.innerHTML = "";
+    snapshot.forEach(doc => {
+      const v = doc.data();
+      vehicleList.innerHTML += `
+        <tr>
+          <td>${v.ownerName}</td>
+          <td>${v.plateNumber}</td>
+          <td>${v.vehicleType}</td>
+        </tr>`;
+    });
+  }
+
+  // Initial load
+  loadVehicles();
+</script>
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Residents Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/resident.css') }}">
+
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+    <div class="logo">
+        <div class="icon">🛡️</div>
+        <div class="title">
+            <h2>Cypress</h2>
+            <span>Admin Dashboard</span>
+        </div>
+    </div>
+    <nav>
+        <ul class="sidebar-menu">
+            <li class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">
+                <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_residents') %}active{% endif %}">
+                <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_visitors') %}active{% endif %}">
+                <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+            </li>
+          <li class="{% if request.path == url_for('admin_qr') %}active{% endif %}">
+  <a href="{{ url_for('admin_qr') }}"><span class="icon">🔲</span> QR Codes</a>
+</li>
+
+            <li class="{% if request.path == url_for('admin_reports') %}active{% endif %}">
+                <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_settings') %}active{% endif %}">
+                <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+
+        <main class="main-content">
+            <header class="header">
+                <input type="search" placeholder="Search residents, visitors, plates..." class="search-bar" />
+                <div class="header-icons">
+                    <div class="top-icons">
+        <button class="icon-btn">🔔<span class="notification-count">{{ notifications|length }}</span></button>
+        <button class="icon-btn">👤</button>
+         <button id="logout-button" class="btn btn-gray text-white font-semibold py-2 px-4 rounded-full">
+                Logout
+            </button>
+                </div>
+            </header>
+
+            <section class="resident-section">
+                <h2>Residents</h2>
+                <p class="subtitle">Manage resident accounts and information</p>
+
+                <div class="sub-header">
+                    <input type="search" placeholder="Search by name, plate number, or address..." />
+                    <div class="filter-bar">
+                <input type="search" placeholder="Search by name, plate number, or address..." class="resident-search" />
+                <select class="status-filter">
+                    <option>All Statuses</option>
+                    <option>Active</option>
+                    <option>Inactive</option>
+                    <option>Suspended</option>
+                </select>
+              
+            </div>
+               <div class="buttons">
+    <button class="filter-btn">
+        <i class="fas fa-filter"></i> Filter
+    </button>
+    <button class="export-btn">
+        <i class="fas fa-file-export"></i> Export
+    </button>
+    <button class="add-resident-btn" onclick="showAddForm()">+ Add Resident</button>
+</div>
+
+<div id="residentFormPopup" class="add-resident-form" style="display:none;">
+    <h3>Add New Resident</h3>
+    <form action="{{ url_for('admin_add_resident') }}" method="POST">
+        <input type="text" name="full_name" placeholder="Full Name" required>
+        <input type="text" name="address" placeholder="Address" required>
+        <input type="text" name="contact" placeholder="Contact Number">
+        <select name="status" required>
+            <option value="active">Active</option>
+            <option value="suspended">Suspended</option>
+        </select>
+        <button type="submit">Add Resident</button>
+        <button type="button" onclick="hideAddForm()">Cancel</button>
+    </form>
+</div>
+
+<script>
+    // --- Log Out functionality ---
+       document.getElementById('logout-button').addEventListener('click', function() {
+    window.location.href = "/logout";   // ✅ tatawag sa Flask logout route
+});
+
+function showAddForm() {
+    document.getElementById('residentFormPopup').style.display = 'block';
+}
+function hideAddForm() {
+    document.getElementById('residentFormPopup').style.display = 'none';
+}
+</script>
+
+              <h3>Resident Directory</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Resident ID</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Contact</th>
+            <th>Vehicle</th>
+            <th>Account Status</th>
+            <th>QR Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="resident-table-body">
+        <!-- Firebase data will populate here -->
+    </tbody>
+</table>
+
+<script type="module">
+    // --- Import Firebase ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+    // --- Your Firebase config ---
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Reference the residents collection
+    const residentsRef = collection(db, "residents");
+
+    // Fetch and display residents
+    async function loadResidents() {
+        const tableBody = document.getElementById("resident-table-body");
+        tableBody.innerHTML = ""; // clear table first
+
+        const q = query(residentsRef, orderBy("created_at", "desc"));
+        const snapshot = await getDocs(q);
+
+        snapshot.forEach(doc => {
+            const r = doc.data();
+            tableBody.innerHTML += `
+                <tr>
+                    <td><strong>${r.resident_id || "-"}</strong></td>
+                    <td>
+                        <strong>${r.full_name || "-"}</strong><br/>
+                        <a href="mailto:${r.email || '-'}">${r.email || '-'}</a>
+                    </td>
+                    <td>${r.address || "-"}</td>
+                    <td>${r.contact || "-"}</td>
+                    <td>
+                        <strong>${r.vehicle_type || "-"}</strong><br/>
+                        ${r.vehicle_plate || "-"}
+                    </td>
+                    <td><span class="status ${r.status.toLowerCase() || 'inactive'}">${r.status || "-"}</span></td>
+                    <td><span class="qr-status ${r.qr_status.toLowerCase() || 'expired'}">${r.qr_status || "-"}</span></td>
+                    <td class="actions">
+                        <button title="View"><i class="fas fa-eye"></i></button>
+                        <button title="Edit"><i class="fas fa-edit"></i></button>
+                        <button title="Delete"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Load residents on page load
+    window.addEventListener("DOMContentLoaded", loadResidents);
+</script>
+
+                        </tbody>
+                    </table>
+                    <script src="{{ url_for('static', filename='js/resident.js') }}"></script>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

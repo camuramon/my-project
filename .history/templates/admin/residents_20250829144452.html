@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Residents Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">🛡️</div>
+        <div>
+          <h2>Cypress</h2>
+          <p>Admin Dashboard</p>
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li class="active"><i class="fas fa-home"></i> Dashboard</li>
+          <li><i class="fas fa-user"></i> Residents</li>
+          <li><i class="fas fa-users"></i> Visitors</li>
+          <li><i class="fas fa-qrcode"></i> QR Codes</li>
+          <li><i class="fas fa-file-alt"></i> Reports</li>
+          <li><i class="fas fa-cog"></i> Settings</li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+      <!-- Header -->
+      <header class="main-header">
+        <input type="search" placeholder="Search residents, visitors, plates..." />
+        <div class="header-icons">
+          <div class="icon-bell">
+            <i class="fas fa-bell"></i><span class="badge">3</span>
+          </div>
+          <div class="icon-user"><i class="fas fa-user-circle"></i></div>
+        </div>
+      </header>
+
+      <!-- Section Title -->
+      <section class="section-header">
+        <h1>Residents</h1>
+        <p>Manage resident accounts and information</p>
+      </section>
+
+      <!-- Filter & Export -->
+      <section class="actions-bar">
+        <button class="btn-filter"><i class="fas fa-filter"></i> Filter</button>
+        <button class="btn-export"><i class="fas fa-file-export"></i> Export</button>
+        <button class="btn-add">+ Add Resident</button>
+      </section>
+
+      <!-- Search and Status Filter -->
+      <section class="search-filter">
+        <input type="search" placeholder="Search by name, plate number, or address..." />
+        <select>
+          <option>All Statuses</option>
+          <option>Active</option>
+          <option>Inactive</option>
+          <option>Suspended</option>
+        </select>
+      </section>
+
+      <!-- Residents Table -->
+      <section class="table-container">
+        <h2>Resident Directory (5)</h2>
+        <table class="residents-table">
+          <thead>
+            <tr>
+              <th>Resident ID</th>
+              <th>Name</th>
+              <th>Address</th>
+              <th>Contact</th>
+              <th>Vehicle</th>
+              <th>Account Status</th>
+              <th>QR Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>R001</strong></td>
+              <td>
+                <strong>John Michael Santos</strong><br />
+                <small>john.santos@email.com</small>
+              </td>
+              <td>Block 1, Lot 15, Cypress ...</td>
+              <td>+63 917 123 4567</td>
+              <td>
+                <strong>SUV</strong><br />
+                ABC 1234
+              </td>
+              <td><span class="status active">Active</span></td>
+              <td><span class="status valid">Valid</span></td>
+              <td class="actions">
+                <i class="fas fa-eye"></i>
+                <i class="fas fa-pen"></i>
+                <i class="fas fa-trash"></i>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>R002</strong></td>
+              <td>
+                <strong>Maria Clara Dela Cruz</strong><br />
+                <small>maria.delacruz@email.com</small>
+              </td>
+              <td>Block 2, Lot 8, Cypress Hi...</td>
+              <td>+63 918 987 6543</td>
+              <td>
+                <strong>Sedan</strong><br />
+                XYZ 9876
+              </td>
+              <td><span class="status active">Active</span></td>
+              <td><span class="status valid">Valid</span></td>
+              <td class="actions">
+                <i class="fas fa-eye"></i>
+                <i class="fas fa-pen"></i>
+                <i class="fas fa-trash"></i>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>R003</strong></td>
+              <td>
+                <strong>Roberto Cruz Martinez</strong><br />
+                <small>robert.martinez@email.com</small>
+              </td>
+              <td>Block 3, Lot 22, Cypress ...</td>
+              <td>+63 919 456 7890</td>
+              <td>
+                <strong>Pickup</strong><br />
+                DEF 5555
+              </td>
+              <td><span class="status suspended">Suspended</span></td>
+              <td><span class="status expired">Expired</span></td>
+              <td class="actions">
+                <i class="fas fa-eye"></i>
+                <i class="fas fa-pen"></i>
+                <i class="fas fa-trash"></i>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>R004</strong></td>
+              <td>
+                <strong>Ana Beatriz Reyes</strong><br />
+                <small>ana.reyes@email.com</small>
+              </td>
+              <td>Block 1, Lot 7, Cypress Hi...</td>
+              <td>+63 920 789 0123</td>
+              <td>
+                <strong>Hatchback</strong><br />
+                GHI 7777
+              </td>
+              <td><span class="status active">Active</span></td>
+              <td><span class="status valid">Valid</span></td>
+              <td class="actions">
+                <i class="fas fa-eye"></i>
+                <i class="fas fa-pen"></i>
+                <i class="fas fa-trash"></i>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>R005</strong></td>
+              <td>
+                <strong>Carlos Eduardo Silva</strong><br />
+                <small>carlos.silva@email.com</small>
+              </td>
+              <td>Block 4, Lot 11, Cypress ...</td>
+              <td>+63 921 345 6789</td>
+              <td>
+                <strong>SUV</strong><br />
+                JKL 2468
+              </td>
+              <td><span class="status inactive">Inactive</span></td>
+              <td><span class="status expired">Expired</span></td>
+              <td class="actions">
+                <i class="fas fa-eye"></i>
+                <i class="fas fa-pen"></i>
+                <i class="fas fa-trash"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

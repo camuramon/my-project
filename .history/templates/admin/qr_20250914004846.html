@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cypress QR Codes</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+</head>
+<body>
+<div class="container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="icon">🛡️</div>
+      <div class="title">
+        <h2>Cypress</h2>
+        <span>Admin Dashboard</span>
+      </div>
+    </div>
+   <nav>
+      <ul class="sidebar-menu">
+        <li class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">
+          <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_residents') %}active{% endif %}">
+          <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_visitors') %}active{% endif %}">
+          <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+        </li>
+       <li class="{% if request.path == url_for('admin_qr') %}active{% endif %}">
+  <a href="{{ url_for('admin_qr') }}"><span class="icon">🔲</span> QR Codes</a>
+</li>
+
+        <li class="{% if request.path == url_for('admin_reports') %}active{% endif %}">
+          <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_settings') %}active{% endif %}">
+          <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="search-bar">
+        <input type="search" placeholder="Search QR codes, visitors..." />
+      </div>
+      <div class="top-icons">
+        <button class="icon-btn">🔔<span class="notification-count">{{ notifications|length }}</span></button>
+        <button class="icon-btn">👤</button>
+        <button id="logout-button" class="btn btn-gray text-white font-semibold py-2 px-4 rounded-full">
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- QR Page Content -->
+    <section class="dashboard-header">
+      <h1>QR Codes</h1>
+      <h2>Generated Visitor QR Passes</h2>
+    </section>
+
+    <!-- QR Cards Section -->
+    <section class="qr-cards">
+      {% for visitor in visitors %}
+      <div class="card qr-card">
+        <h3>{{ visitor.fullName }}</h3>
+        <img src="{{ visitor.photoUrl }}" alt="Visitor Photo" class="visitor-photo" />
+        <img src="{{ visitor.qrUrl }}" alt="Visitor QR" class="visitor-qr" />
+        <p>Status: <span class="status {% if visitor.status == 'Active' %}active{% else %}expired{% endif %}">{{ visitor.status }}</span></p>
+      </div>
+      {% endfor %}
+    </section>
+  </main>
+</div>
+
+<script>
+  document.getElementById('logout-button').addEventListener('click', function() {
+    window.location.href = "/logout";
+  });
+</script>
+</body>
+</html>

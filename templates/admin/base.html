@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Admin{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <aside class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="{% if active_page == 'dashboard' %}active{% endif %}">
+                <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+            </li>
+            <li class="{% if active_page == 'residents' %}active{% endif %}">
+                <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+            </li>
+            <li class="{% if active_page == 'visitors' %}active{% endif %}">
+                <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+            </li>
+            <li class="{% if active_page == 'qr_codes' %}active{% endif %}">
+                <a href="{{ url_for('admin_qr_codes') }}"><span class="icon">🔲</span> QR Codes</a>
+            </li>
+            <li class="{% if active_page == 'reports' %}active{% endif %}">
+                <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+            </li>
+            <li class="{% if active_page == 'settings' %}active{% endif %}">
+                <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

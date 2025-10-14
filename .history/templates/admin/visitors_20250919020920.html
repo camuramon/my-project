@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cypress Admin Dashboard - Visitors</title>
+    <!-- Connect visitor.css -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/visitor.css') }}">
+</head>
+<body>
+     <div class="container">
+    <aside class="sidebar">
+    <div class="logo">
+        <div class="icon">🛡️</div>
+        <div class="title">
+            <h2>Cypress</h2>
+            <span>Admin Dashboard</span>
+        </div>
+    </div>
+    <nav>
+        <ul class="sidebar-menu">
+            <li class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">
+                <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_residents') %}active{% endif %}">
+                <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_visitors') %}active{% endif %}">
+                <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+            </li>
+          <li class="{% if request.path == url_for('admin_qr') %}active{% endif %}">
+  <a href="{{ url_for('admin_qr') }}"><span class="icon">🔲</span> QR Codes</a>
+</li>
+
+            <li class="{% if request.path == url_for('admin_reports') %}active{% endif %}">
+                <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_settings') %}active{% endif %}">
+                <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+
+
+    <main class="main-content">
+        <header class="topbar">
+          <input type="search" placeholder="Search by name, plate number, purpose, or host..." />
+            <div class="topbar-actions">
+                <button class="btn filter">Filter</button>
+                <button class="btn export">Export</button>
+                <button class="btn register-visitor">+ Register Visitor</button>
+                <div class="notification">
+                    <span class="icon">🔔</span>
+                    <span class="badge">0</span>
+                </div>
+                <div class="profile-icon">👤</div>
+                <button id="logout-button" class="btn btn-gray text-white font-semibold py-2 px-4 rounded-full">
+                Logout
+            </button>
+            </div>
+        </header>
+
+<script>
+       document.getElementById('logout-button').addEventListener('click', function() {
+    window.location.href = "/logout";   // ✅ tatawag sa Flask logout route
+});
+</script>
+        <section class="page-info">
+            <h2>Visitors</h2>
+            <p>Track and manage visitor access</p>
+
+            <div class="search-filter">
+                <input type="search" placeholder="Search by name, plate number, purpose, or host..." />
+                <select>
+                    <option>All QR Codes</option>
+                </select>
+            </div>
+
+            <div class="visitor-log">
+                <h3>Visitor Log (5)</h3>
+                  <div id="recent-visitors"></div> 
+                <table>
+                    <thead>
+    <tr>
+      
+        <th>Photo</th>
+        <th>Name</th>
+        <th>Vehicle &amp; ID</th>
+        <th>Purpose</th>
+     
+        <th>Visit Time</th>
+        <th>Visit Status</th>
+        <th>QR Status</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+<tbody>
+    {% for visitor in visitors %}
+    <tr>
+       
+        <td>
+            <img src="{{ visitor.photo if visitor.photo else url_for('static', filename='image/default-visitor.png') }}"
+                 alt="Visitor Photo"
+                 style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+        </td>
+        <td><strong>{{ visitor.fullName }}</strong></td>
+        <td>
+            <strong>{{ visitor.vehicleType }} - {{ visitor.plateNumber }}</strong><br>
+            {{ visitor.idType }}: {{ visitor.idNumber }}
+        </td>
+        <td>{{ visitor.host if visitor.host else "N/A" }}</td>
+        <td><span class="clock-icon">⏲️</span> In:<br><strong>{{ visitor.visitTime }}</strong></td>
+        <td>
+            <span class="status {{ 'active-visit' if visitor.status == 'Active' else 'expired-visit' }}">
+                {{ visitor.status }}
+            </span>
+        </td>
+        <td>
+            <span class="qr-status {{ 'valid' if visitor.qrCode else 'invalid' }}">
+                {{ 'Valid' if visitor.qrCode else 'Invalid' }}
+            </span>
+        </td>
+        <td class="actions">
+            <span class="icon">👁️</span>
+            <span class="icon">✏️</span>
+            <span class="icon">🗑️</span>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+                </table>
+            </div>
+        </section>
+    </main>
+<script src="{{ url_for('static', filename='js/visitors.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,293 @@
+/* General Reset and Base */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0e0e0f;
+    color: #ddd;
+    display: flex;
+    min-height: 100vh;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    color: #aaa;
+    font-weight: 600;
+    transition: background 0.3s, color 0.3s;
+}
+
+.sidebar-menu li a i {
+    font-size: 1.2rem;
+}
+
+.sidebar-menu li.active a,
+.sidebar-menu li a:hover {
+    background-color: #292929;
+    color: white;
+}
+
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 3rem;
+    overflow-y: auto;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.search-bar {
+    width: 400px;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    background-color: #1f1f1f;
+    color: white;
+}
+
+.search-bar::placeholder {
+    color: #777;
+}
+
+.header-icons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.notification-btn,
+.user-btn {
+    position: relative;
+    background-color: #1f1f1f;
+    border: none;
+    padding: 0.5rem 0.6rem;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.notification-count {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    font-size: 0.7rem;
+    background: #e03c56;
+    color: white;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Resident Section */
+.resident-section h2 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 0.2rem;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: #888;
+    margin-bottom: 1.5rem;
+}
+
+.sub-header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.sub-header input[type="search"] {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    background-color: #1f1f1f;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+}
+
+.sub-header select {
+    background-color: #1f1f1f;
+    border: none;
+    padding: 0.7rem 1rem;
+    color: white;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.buttons {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.filter-btn,
+.export-btn,
+.add-resident-btn {
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.filter-btn {
+    background-color: #292929;
+    color: white;
+}
+
+.export-btn {
+    background-color: #292929;
+    color: white;
+}
+
+.add-resident-btn {
+    background-color: #3ebd52;
+    color: white;
+}
+
+/* Resident Directory */
+.resident-directory {
+    background-color: #1c1c1c;
+    padding: 1rem;
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+.resident-directory h3 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #eee;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #ddd;
+    font-size: 0.9rem;
+}
+
+thead th {
+    text-align: left;
+    padding: 1rem 1rem 0.7rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #333;
+    color: #888;
+}
+
+tbody td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #2c2c2c;
+    vertical-align: middle;
+}
+
+tbody td a {
+    color: #777;
+    font-size: 0.8rem;
+    text-decoration: none;
+}
+
+tbody tr:hover {
+    background-color: #292929;
+}
+
+.status,
+.qr-status {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: white;
+    min-width: 60px;
+    text-align: center;
+}
+
+/* Status Colors */
+.status.active,
+.qr-status.valid {
+    background-color: #3ebd52;
+}
+
+.status.inactive,
+.qr-status.expired {
+    background-color: #c2a500;
+}
+
+.status.suspended {
+    background-color: #9a1e21;
+}
+
+/* Actions */
+.actions button {
+    background: transparent;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+}
+
+.actions button:hover {
+    color: white;
+}
+
+/* Vehicle Column Bold for vehicle type */
+tbody td:nth-child(5) strong {
+    display: block;
+    font-weight: 700;
+}

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guard Page - Entry and Exit Monitoring System</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    h2 { margin-top: 0; }
+    form, #qr-result, #scan-result, #database {
+      background: #fff; padding: 16px; border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 20px;
+    }
+    input, button { padding: 8px; margin: 6px 0; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    img { border-radius: 8px; object-fit: cover; }
+    .flex { display: flex; gap: 20px; align-items: center; }
+    .modal {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+      justify-content: center; align-items: center;
+    }
+    .modal-content {
+      background: #fff; padding: 20px; border-radius: 8px;
+      width: 400px; text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Visitor Registration</h2>
+  <form id="registerForm">
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="text" id="contact" placeholder="Contact Number" required>
+    <input type="text" id="purpose" placeholder="Purpose of Visit" required>
+    <input type="url" id="photoURL" placeholder="Photo URL (optional)">
+    <button type="submit">Register & Generate QR</button>
+  </form>
+
+  <div id="qr-result"></div>
+
+  <h2>Simulate QR Scan</h2>
+  <input type="text" id="qrScanner" placeholder="Enter Visitor ID">
+  <button onclick="scanQRCode()">Scan</button>
+  <button onclick="resetScanner()">Reset</button>
+  <div id="scan-result"></div>
+
+  <h2>Visitor Database</h2>
+  <button onclick="refreshDatabase()">Refresh</button>
+  <table id="visitorTable">
+    <thead>
+      <tr>
+        <th>Name</th><th>Contact</th><th>Purpose</th><th>Photo</th><th>Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Walk-in Visitor</h2>
+  <button onclick="openWalkInModal()">Add Walk-in Visitor</button>
+
+  <div class="modal" id="walkInModal">
+    <div class="modal-content">
+      <h3>Walk-in Visitor</h3>
+      <input type="text" id="walkin-name" placeholder="Full Name" required>
+      <input type="text" id="walkin-contact" placeholder="Contact Number" required>
+      <input type="text" id="walkin-purpose" placeholder="Purpose" required>
+      <input type="url" id="walkin-photo" placeholder="Photo URL (optional)">
+      <br><br>
+      <button onclick="saveWalkIn()">Save</button>
+      <button onclick="closeWalkInModal()">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    // ✅ Firebase config (palitan mo ng real values mo)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ✅ Register visitor
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const contact = document.getElementById("contact").value;
+      const purpose = document.getElementById("purpose").value;
+      const photoURL = document.getElementById("photoURL").value;
+
+      const visitor = { name, contact, purpose, photoURL, createdAt: new Date() };
+
+      db.collection("visitors").add(visitor).then((docRef) => {
+        document.getElementById("qr-result").innerHTML = `
+          <h3>Visitor Registered!</h3>
+          <div class="flex">
+            <div>
+              <p><strong>Name:</strong> ${name}</p>
+              <p><strong>Contact:</strong> ${contact}</p>
+              <p><strong>Purpose:</strong> ${purpose}</p>
+              ${photoURL ? `<img src="${photoURL}" alt="Visitor Photo" width="120" height="120">` : ""}
+            </div>
+            <div id="qrcode"></div>
+          </div>
+          <button onclick="printQRCode()">Print QR</button>
+          <p><strong>Visitor ID:</strong> ${docRef.id}</p>
+        `;
+        const qrDiv = document.getElementById("qrcode");
+        qrDiv.innerHTML = "";
+        new QRCode(qrDiv, { text: docRef.id, width: 128, height: 128 });
+      });
+    });
+
+    // ✅ Print QR
+    function printQRCode() {
+      const section = document.getElementById("qr-result").innerHTML;
+      const newWindow = window.open("", "", "width=600,height=600");
+      newWindow.document.write(`
+        <html><head><title>Visitor QR Code</title></head>
+        <body>${section}
+        <script>window.onload=function(){window.print(); window.onafterprint=function(){window.close();};}</script>
+        </body></html>
+      `);
+      newWindow.document.close();
+    }
+
+    // ✅ Scan QR simulation
+    function scanQRCode() {
+      const code = document.getElementById("qrScanner").value;
+      if (!code) return;
+
+      db.collection("visitors").doc(code).get().then((doc) => {
+        if (doc.exists) {
+          const visitor = doc.data();
+          document.getElementById("scan-result").innerHTML = `
+            <h3>Visitor Info</h3>
+            <div class="flex">
+              <div>
+                ${visitor.photoURL ? `<img src="${visitor.photoURL}" alt="Visitor Photo" width="120" height="120">` : ""}
+                <p><strong>Name:</strong> ${visitor.name}</p>
+                <p><strong>Contact:</strong> ${visitor.contact}</p>
+                <p><strong>Purpose:</strong> ${visitor.purpose}</p>
+              </div>
+              <div id="scan-qr"></div>
+            </div>
+          `;
+          const qrDiv = document.getElementById("scan-qr");
+          qrDiv.innerHTML = "";
+          new QRCode(qrDiv, { text: doc.id, width: 128, height: 128 });
+        } else {
+          document.getElementById("scan-result").innerHTML = "<p style='color:red'>Visitor not found</p>";
+        }
+      });
+    }
+
+    function resetScanner() {
+      document.getElementById("qrScanner").value = "";
+      document.getElementById("scan-result").innerHTML = "";
+    }
+
+    // ✅ Refresh database
+    function refreshDatabase() {
+      const tbody = document.querySelector("#visitorTable tbody");
+      tbody.innerHTML = "";
+      db.collection("visitors").orderBy("createdAt", "desc").get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const v = doc.data();
+          const row = `
+            <tr>
+              <td>${v.name}</td>
+              <td>${v.contact}</td>
+              <td>${v.purpose}</td>
+              <td>${v.photoURL ? `<img src="${v.photoURL}" width="60" height="60">` : ""}</td>
+              <td>${v.createdAt.toDate().toLocaleString()}</td>
+            </tr>`;
+          tbody.innerHTML += row;
+        });
+      });
+    }
+
+    // ✅ Walk-in visitor modal
+    function openWalkInModal() {
+      document.getElementById("walkInModal").style.display = "flex";
+    }
+    function closeWalkInModal() {
+      document.getElementById("walkInModal").style.display = "none";
+    }
+    function saveWalkIn() {
+      const name = document.getElementById("walkin-name").value;
+      const contact = document.getElementById("walkin-contact").value;
+      const purpose = document.getElementById("walkin-purpose").value;
+      const photoURL = document.getElementById("walkin-photo").value;
+
+      const visitor = { name, contact, purpose, photoURL, createdAt: new Date() };
+
+      db.collection("visitors").add(visitor).then(() => {
+        alert("Walk-in Visitor Added!");
+        closeWalkInModal();
+        refreshDatabase();
+      });
+    }
+  </script>
+</body>
+</html>

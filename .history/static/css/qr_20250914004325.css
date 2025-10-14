@@ -1,0 +1,43 @@
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f5f6fa;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.qr-container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 320px;
+}
+
+.qr-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.qr-container img {
+  border-radius: 12px;
+  margin: 10px 0;
+  max-width: 100%;
+}
+
+.qr-container .visitor-photo {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 3px solid #3498db;
+}
+
+.qr-container .visitor-qr {
+  width: 150px;
+  height: 150px;
+}

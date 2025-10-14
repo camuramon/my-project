@@ -1,0 +1,396 @@
+<!-- settings.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings - Subdivision Visitor Management System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+  <link
+    href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet"
+  />
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+ <nav>
+      <ul class="sidebar-menu">
+        <li class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">
+          <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_residents') %}active{% endif %}">
+          <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_visitors') %}active{% endif %}">
+          <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+        </li>
+       <li class="{% if request.path == url_for('admin_qr') %}active{% endif %}">
+  <a href="{{ url_for('admin_qr') }}"><span class="icon">🔲</span> QR Codes</a>
+</li>
+
+        <li class="{% if request.path == url_for('admin_reports') %}active{% endif %}">
+          <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+        </li>
+        <li class="{% if request.path == url_for('admin_settings') %}active{% endif %}">
+          <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <!-- Top Navigation -->
+      <header class="top-nav">
+        <h2>Settings</h2>
+        <div class="top-nav-actions">
+          <button id="logoutBtn" class="btn btn-primary">Logout</button>
+        </div>
+      </header>
+
+      <!-- Settings container -->
+      <section class="settings-container">
+        <nav class="settings-tabs" role="tablist" aria-label="Settings Sections">
+          <button
+            class="tab-button active"
+            role="tab"
+            aria-selected="true"
+            aria-controls="tab-user-management"
+            id="tab-btn-user-management"
+            data-tab="user-management"
+          >
+            User Management
+          </button>
+          <button
+            class="tab-button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-subdivision-settings"
+            id="tab-btn-subdivision-settings"
+            data-tab="subdivision-settings"
+          >
+            Subdivision Settings
+          </button>
+          <button
+            class="tab-button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-notification-settings"
+            id="tab-btn-notification-settings"
+            data-tab="notification-settings"
+          >
+            Notification Settings
+          </button>
+          <button
+            class="tab-button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="tab-system-preferences"
+            id="tab-btn-system-preferences"
+            data-tab="system-preferences"
+          >
+            System Preferences
+          </button>
+        </nav>
+
+        <div class="tabs-content">
+          <!-- User Management Tab -->
+          <section
+            id="tab-user-management"
+            class="tab-panel active"
+            role="tabpanel"
+            aria-labelledby="tab-btn-user-management"
+          >
+            <div class="card">
+              <header class="card-header">
+                <h3>Users</h3>
+                <button id="addUser Btn" class="btn btn-primary">
+                  <span class="material-icons">person_add</span> Add User
+                </button>
+              </header>
+              <div class="card-body">
+                <table class="table" id="usersTable" aria-label="Users Table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Users populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Add/Edit User Modal -->
+            <div id="userModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
+              <div class="modal-content">
+                <header class="modal-header">
+                  <h3 id="userModalTitle">Add User</h3>
+                  <button class="modal-close-btn" aria-label="Close modal">&times;</button>
+                </header>
+                <form id="userForm">
+                  <input type="hidden" id="userId" />
+                  <div class="form-group">
+                    <label for="userName">Name</label>
+                    <input type="text" id="userName" name="userName" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="userRole">Role</label>
+                    <select id="userRole" name="userRole" required>
+                      <option value="Admin">Admin</option>
+                      <option value="Guard">Guard</option>
+                      <option value="Employee">Employee</option>
+                    </select>
+                  </div>
+                  <div class="form-group toggle-group">
+                    <label for="userStatus">Active Status</label>
+                    <label class="switch">
+                      <input type="checkbox" id="userStatus" name="userStatus" checked />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <!-- Subdivision Settings Tab -->
+          <section
+            id="tab-subdivision-settings"
+            class="tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-btn-subdivision-settings"
+            hidden
+          >
+            <div class="card">
+              <header class="card-header">
+                <h3>Properties</h3>
+                <button id="addPropertyBtn" class="btn btn-primary">
+                  <span class="material-icons">add_home</span> Add Property
+                </button>
+              </header>
+              <div class="card-body">
+                <table class="table" id="propertiesTable" aria-label="Properties Table">
+                  <thead>
+                    <tr>
+                      <th>Lot Number</th>
+                      <th>House Owner</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Properties populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top: 2rem;">
+              <header class="card-header">
+                <h3>Guardhouse Accounts & Schedules</h3>
+                <button id="addGuardhouseBtn" class="btn btn-primary">
+                  <span class="material-icons">add</span> Add Guard & Shift
+                </button>
+              </header>
+              <div class="card-body">
+                <table class="table" id="guardhouseTable" aria-label="Guardhouse Accounts Table">
+                  <thead>
+                    <tr>
+                      <th>Guard Name</th>
+                      <th>Shift Start</th>
+                      <th>Shift End</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Guardhouse accounts populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card" style="margin-top: 2rem;">
+              <header class="card-header">
+                <h3>Gate Schedule</h3>
+              </header>
+              <div class="card-body">
+                <form id="gateScheduleForm" class="form-inline">
+                  <div class="form-group">
+                    <label for="gateOpenTime">Open Time</label>
+                    <input type="time" id="gateOpenTime" name="gateOpenTime" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="gateCloseTime">Close Time</label>
+                    <input type="time" id="gateCloseTime" name="gateCloseTime" required />
+                  </div>
+                  <div class="form-actions" style="margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary">Save Schedule</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Add/Edit Property Modal -->
+            <div id="propertyModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="propertyModalTitle">
+              <div class="modal-content">
+                <header class="modal-header">
+                  <h3 id="propertyModalTitle">Add Property</h3>
+                  <button class="modal-close-btn" aria-label="Close modal">&times;</button>
+                </header>
+                <form id="propertyForm">
+                  <input type="hidden" id="propertyId" />
+                  <div class="form-group">
+                    <label for="lotNumber">Lot Number</label>
+                    <input type="text" id="lotNumber" name="lotNumber" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="houseOwner">House Owner</label>
+                    <input type="text" id="houseOwner" name="houseOwner" required />
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Add/Edit Guardhouse Modal -->
+            <div id="guardhouseModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="guardhouseModalTitle">
+              <div class="modal-content">
+                <header class="modal-header">
+                  <h3 id="guardhouseModalTitle">Add Guard & Shift</h3>
+                  <button class="modal-close-btn" aria-label="Close modal">&times;</button>
+                </header>
+                <form id="guardhouseForm">
+                  <input type="hidden" id="guardhouseId" />
+                  <div class="form-group">
+                    <label for="guardName">Guard Name</label>
+                    <input type="text" id="guardName" name="guardName" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="shiftStart">Shift Start</label>
+                    <input type="time" id="shiftStart" name="shiftStart" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="shiftEnd">Shift End</label>
+                    <input type="time" id="shiftEnd" name="shiftEnd" required />
+                  </div>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <!-- Notification Settings Tab -->
+          <section
+            id="tab-notification-settings"
+            class="tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-btn-notification-settings"
+            hidden
+          >
+            <div class="card">
+              <header class="card-header">
+                <h3>Notification Preferences</h3>
+              </header>
+              <div class="card-body">
+                <form id="notificationSettingsForm">
+                  <div class="form-group toggle-group">
+                    <label for="emailAlerts">Email Alerts</label>
+                    <label class="switch">
+                      <input type="checkbox" id="emailAlerts" name="emailAlerts" />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="form-group toggle-group">
+                    <label for="smsAlerts">SMS Alerts</label>
+                    <label class="switch">
+                      <input type="checkbox" id="smsAlerts" name="smsAlerts" />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="form-group toggle-group">
+                    <label for="pushNotifications">Push Notifications</label>
+                    <label class="switch">
+                      <input type="checkbox" id="pushNotifications" name="pushNotifications" />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="form-actions" style="margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                    <button type="button" id="testNotificationBtn" class="btn btn-secondary">Test Notification</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <!-- System Preferences Tab -->
+          <section
+            id="tab-system-preferences"
+            class="tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-btn-system-preferences"
+            hidden
+          >
+            <div class="card">
+              <header class="card-header">
+                <h3>Appearance & System Settings</h3>
+              </header>
+              <div class="card-body">
+                <form id="systemPreferencesForm">
+                  <div class="form-group toggle-group">
+                    <label for="darkModeToggle">Dark Mode</label>
+                    <label class="switch">
+                      <input type="checkbox" id="darkModeToggle" name="darkModeToggle" />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="form-group">
+                    <label for="systemName">System Name</label>
+                    <input type="text" id="systemName" name="systemName" placeholder="Subdivision Visitor Management System" />
+                  </div>
+                  <div class="form-group">
+                    <label for="subdivisionLogo">Subdivision Logo</label>
+                    <input type="file" id="subdivisionLogo" name="subdivisionLogo" accept="image/*" />
+                    <div id="logoPreviewContainer" style="margin-top: 0.5rem;">
+                      <img id="logoPreview" alt="Logo Preview" style="max-height: 80px; border-radius: 6px; display:none;" />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="languageSelector">Language</label>
+                    <select id="languageSelector" name="languageSelector">
+                      <option value="en">English</option>
+                      <option value="tl">Tagalog</option>
+                    </select>
+                  </div>
+                  <div class="form-actions" style="margin-top: 1rem;">
+                    <button type="submit" class="btn btn-primary">Save Preferences</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

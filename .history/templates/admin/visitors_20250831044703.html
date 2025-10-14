@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cypress Admin Dashboard - Visitors</title>
+    <!-- Connect visitor.css -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/visitor.css') }}">
+</head>
+<body>
+    <aside class="sidebar">
+    <div class="logo">
+        <div class="icon">🛡️</div>
+        <div class="title">
+            <h2>Cypress</h2>
+            <span>Admin Dashboard</span>
+        </div>
+    </div>
+    <nav>
+        <ul class="sidebar-menu">
+            <li class="{% if request.path == url_for('admin_dashboard') %}active{% endif %}">
+                <a href="{{ url_for('admin_dashboard') }}"><span class="icon">🏠</span> Dashboard</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_residents') %}active{% endif %}">
+                <a href="{{ url_for('admin_residents') }}"><span class="icon">👥</span> Residents</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_visitors') %}active{% endif %}">
+                <a href="{{ url_for('admin_visitors') }}"><span class="icon">👤</span> Visitors</a>
+            </li>
+            <li>
+                <a href="#"><span class="icon">🔲</span> QR Codes</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_reports') %}active{% endif %}">
+                <a href="{{ url_for('admin_reports') }}"><span class="icon">📄</span> Reports</a>
+            </li>
+            <li class="{% if request.path == url_for('admin_settings') %}active{% endif %}">
+                <a href="{{ url_for('admin_settings') }}"><span class="icon">⚙️</span> Settings</a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+
+
+    <main class="main-content">
+        <header class="topbar">
+            <input type="search" placeholder="Search residents, visitors, plates..." />
+            <div class="topbar-actions">
+                <button class="btn filter">Filter</button>
+                <button class="btn export">Export</button>
+                <button class="btn register-visitor">+ Register Visitor</button>
+                <div class="notification">
+                    <span class="icon">🔔</span>
+                    <span class="badge">3</span>
+                </div>
+                <div class="profile-icon">👤</div>
+            </div>
+        </header>
+
+        <section class="page-info">
+            <h2>Visitors</h2>
+            <p>Track and manage visitor access</p>
+
+            <div class="search-filter">
+                <input type="search" placeholder="Search by name, plate number, purpose, or host..." />
+                <select>
+                    <option>All QR Codes</option>
+                </select>
+            </div>
+
+            <div class="visitor-log">
+                <h3>Visitor Log (5)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Visitor ID</th>
+                            <th>Name</th>
+                            <th>Vehicle &amp; ID</th>
+                            <th>Purpose</th>
+                            <th>Host Resident</th>
+                            <th>Visit Time</th>
+                            <th>Visit Status</th>
+                            <th>QR Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>V001</td>
+                            <td><strong>Jennifer Anne Lopez</strong></td>
+                            <td>
+                                <strong>Sedan - MNO 1357</strong><br />
+                                Driver's License: D12-34-567890
+                            </td>
+                            <td>Family Visit</td>
+                            <td>John Michael <br /> Santos</td>
+                            <td><span class="clock-icon">⏲️</span> In:<br /><strong>14:30</strong></td>
+                            <td><span class="status active-visit">Active Visit</span></td>
+                            <td><span class="qr-status valid">Valid</span></td>
+                            <td class="actions">
+                                <span class="icon">👁️</span>
+                                <span class="icon">✏️</span>
+                                <span class="icon">🗑️</span>
+                            </td>
+                        </tr>
+                        <!-- Additional visitor rows -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

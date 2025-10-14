@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cypress - Residents</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="dashboard-container">
+    <nav class="sidebar">
+      <div class="logo-section">
+        <div class="logo-icon">🛡️</div>
+        <div>
+          <h2>Cypress</h2>
+          <p>Admin Panel</p>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li class="active"><a href="{{ url_for('admin_residents') }}"><i class="fas fa-users"></i> Residents</a></li>
+        <li><a href="{{ url_for('admin_visitors') }}"><i class="fas fa-user-friends"></i> Visitors</a></li>
+        <li><a href="{{ url_for('admin_reports') }}"><i class="fas fa-file-alt"></i> Reports</a></li>
+        <li><a href="{{ url_for('admin_settings') }}"><i class="fas fa-cog"></i> Settings</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content">
+      <header>
+        <h1>Residents</h1>
+      </header>
+
+      <section class="table-container">
+        <div class="table-header">
+          <h3>Resident List</h3>
+          <a href="#">Add New</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Address</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Juan Dela Cruz</strong></td>
+              <td>Block 1, Lot 5</td>
+              <td><span class="status active">Active</span></td>
+              <td><i class="fas fa-edit"></i> <i class="fas fa-trash"></i></td>
+            </tr>
+            <tr>
+              <td><strong>Maria Santos</strong></td>
+              <td>Block 2, Lot 8</td>
+              <td><span class="status suspended">Suspended</span></td>
+              <td><i class="fas fa-edit"></i> <i class="fas fa-trash"></i></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

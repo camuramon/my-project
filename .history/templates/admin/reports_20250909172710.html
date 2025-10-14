@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VMS Reports Dashboard</title>
+  <link rel="stylesheet" href="styles.css">   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="icon">🛡️</div>
+      <div class="title">
+        <h2>Cypress</h2>
+        <span>Admin Dashboard</span>
+      </div>
+    </div>
+    <nav>
+      <ul class="sidebar-menu">
+        <li>
+          <a href="#"><span class="icon">🏠</span> Dashboard</a>
+        </li>
+        <li>
+          <a href="#"><span class="icon">👥</span> Residents</a>
+        </li>
+        <li>
+          <a href="#"><span class="icon">👤</span> Visitors</a>
+        </li>
+        <li><a href="#"><span class="icon">🔲</span> QR Codes</a></li>
+        <li class="active">
+          <a href="#"><span class="icon">📄</span> Reports</a>
+        </li>
+        <li>
+          <a href="#"><span class="icon">⚙️</span> Settings</a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div class="search-bar">
+        <input type="search" placeholder="Search residents, visitors, plates..." />
+      </div>
+      <div class="top-icons">
+        <button class="icon-btn">🔔<span class="notification-count">3</span></button>
+        <button class="icon-btn">👤</button>
+      </div>
+    </header>
+
+    <div class="visitor-stats-cards">
+        <div class="card">
+            <h2>Total Visitors</h2>
+            <p>1,234</p>
+            <p class="change">+12% vs last month</p>
+        </div>
+        <div class="card">
+            <h2>Active Residents</h2>
+            <p>567</p>
+            <p class="change">-3% vs last month</p>
+        </div>
+        <div class="card">
+            <h2>Pending Entries</h2>
+            <p>89</p>
+            <p class="change">New!</p>
+        </div>
+    </div>
+
+    <div class="charts">
+      <div class="chart-container">
+        <h3 class="text-lg font-semibold">Visitor Logs per Period</h3>
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3 class="text-lg font-semibold">Entry Purpose Distribution</h3>
+        <canvas id="horizontalChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3 class="text-lg font-semibold">Vehicles Used</h3>
+        <canvas id="pieChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3 class="text-lg font-semibold">Access Points</h3>
+        <canvas id="accessChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3 class="text-lg font-semibold">Device Access</h3>
+        <canvas id="deviceChart"></canvas>
+      </div>
+    </div>
+
+    <section class="tables-section">
+    <div class="card">
+      <h3 class="text-lg font-semibold mb-2">Visitor Logs</h3>
+      <div class="overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Purpose</th>
+              <th>Vehicle</th>
+              <th>Time In/Out</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>John Doe</td>
+              <td>Delivery</td>
+              <td>Car</td>
+              <td>9:00 AM / 9:15 AM</td>
+              <td>Exited</td>
+            </tr>
+            <tr>
+              <td>Jane Smith</td>
+              <td>Guest</td>
+              <td>Motorcycle</td>
+              <td>10:00 AM / -</td>
+              <td>Inside</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <a href="#" class="text-blue-400 float-right mt-2">View All</a>
+      <button class="btn-green mt-2">Export</button>
+    </div>
+    <div class="card">
+      <h3 class="text-lg font-semibold mb-2">Resident Reports</h3>
+      <div class="overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Alice Johnson</td>
+              <td><span class="bg-green-600 px-2 py-1 rounded">Active</span></td>
+            </tr>
+            <tr>
+              <td>Bob Lee</td>
+              <td><span class="bg-yellow-600 px-2 py-1 rounded">Suspended</span></td>
+            </tr>
+            <tr>
+              <td>Charlie Brown</td>
+              <td><span class="bg-red-600 px-2 py-1 rounded">Blacklisted</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <a href="#" class="text-blue-400 float-right mt-2">View All</a>
+      <button class="btn-green mt-2">Export</button>
+    </div>
+  </section>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Bar Chart
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        label: 'Visitors',
+        data: [120, 150, 90, 180, 200, 250, 170],
+        backgroundColor: 'rgba(74, 144, 226, 0.7)',
+        borderColor: 'rgba(74, 144, 226, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Horizontal Bar Chart
+  const horizontalCtx = document.getElementById('horizontalChart').getContext('2d');
+  new Chart(horizontalCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Delivery', 'Guest', 'Meeting', 'Service', 'Other'],
+      datasets: [{
+        label: 'Entry Purpose',
+        data: [50, 40, 30, 20, 10],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.7)',
+          'rgba(54, 162, 235, 0.7)',
+          'rgba(255, 206, 86, 0.7)',
+          'rgba(75, 192, 192, 0.7)',
+          'rgba(153, 102, 255, 0.7)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Pie Chart
+  const pieCtx = document.getElementById('pieChart').getContext('2d');
+  new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+      labels: ['Car', 'Motorcycle', 'Truck', 'Bike', 'Foot'],
+      datasets: [{
+        data: [60, 25, 5, 5, 5],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.7)',
+          'rgba(54, 162, 235, 0.7)',
+          'rgba(255, 206, 86, 0.7)',
+          'rgba(75, 192, 192, 0.7)',
+          'rgba(153, 102, 255, 0.7)'
+        ],
+        borderColor: 'transparent'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+    }
+  });
+
+  // Access Chart
+  const accessCtx = document.getElementById('accessChart').getContext('2d');
+  new Chart(accessCtx, {
+    type: 'line',
+    data: {
+      labels: ['Gate 1', 'Gate 2', 'Main Entrance', 'Back Gate'],
+      datasets: [{
+        label: 'Entries',
+        data: [400, 250, 350, 100],
+        borderColor: 'rgba(32, 143, 63, 1)',
+        backgroundColor: 'rgba(32, 143, 63, 0.2)',
+        tension: 0.3,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  // Device Chart
+  const deviceCtx = document.getElementById('deviceChart').getContext('2d');
+  new Chart(deviceCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Mobile', 'Tablet', 'Desktop'],
+      datasets: [{
+        data: [70, 20, 10],
+        backgroundColor: [
+          'rgba(75, 192, 192, 0.7)',
+          'rgba(255, 206, 86, 0.7)',
+          'rgba(153, 102, 255, 0.7)'
+        ],
+        borderColor: 'transparent'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+    }
+  });
+});
+</script>
+
+</body>
+</html>

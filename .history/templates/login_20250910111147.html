@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cypress Subdivision - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color-light: #f3f4f6;
+            --card-bg-light: #ffffff;
+            --text-color-light: #1f2937;
+            --sub-text-color-light: #6b7280;
+            --border-color-light: #e5e7eb;
+            --primary-color: #4c1d95; /* Deep Purple */
+            --primary-hover: #3b0764;
+        }
+        .dark {
+            --bg-color-light: #111827;
+            --card-bg-light: #1f2937;
+            --text-color-light: #f9fafb;
+            --sub-text-color-light: #9ca3af;
+            --border-color-light: #374151;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .card {
+            background-color: var(--card-bg-light);
+            transition: background-color 0.3s;
+        }
+        .input-field {
+            background-color: var(--card-bg-light);
+            border-color: var(--border-color-light);
+            color: var(--text-color-light);
+            transition: all 0.2s ease;
+        }
+        .input-field:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 29, 149, 0.5);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        
+        /* --- New CSS for the sliding button --- */
+        .dark #theme-toggle span {
+            transform: translateX(100%);
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen antialiased justify-center items-center p-4">
+
+    <div class="absolute top-6 right-6">
+        <button id="theme-toggle" class="relative w-16 h-8 rounded-full bg-gray-200 dark:bg-gray-700 transition-colors duration-300 flex items-center justify-between p-1 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <svg class="h-6 w-6 text-gray-800 dark:text-gray-300 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+            <span class="absolute w-6 h-6 bg-white dark:bg-gray-900 rounded-full shadow-lg transform transition-transform duration-300 ease-in-out"></span>
+            <svg class="h-6 w-6 text-yellow-500 transition-opacity duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="relative w-full max-w-5xl overflow-hidden bg-white dark:bg-gray-800 rounded-2xl shadow-2xl md:grid md:grid-cols-2 lg:h-[600px] md:h-[500px]">
+        <div class="bg-purple-700 dark:bg-purple-900 p-8 flex flex-col justify-center items-center text-center text-white md:p-12">
+            <div class="max-w-md">
+                <h1 class="text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+                     Entry and Exit Monitoring System 
+                    <br class="hidden md:inline">
+                  with QR Code and Vehicle Verification
+                </h1>
+                <p class="mt-4 text-purple-200 dark:text-purple-300 text-sm md:text-base">
+                    Secure and efficient visitor tracking for a safer community.
+                </p>
+            </div>
+        </div>
+        <div class="flex flex-col justify-center p-8 md:p-12">
+            <div class="w-full max-w-sm mx-auto">
+                <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white text-center mb-2">
+                    Welcome Back 👋
+                </h2>
+                <p class="text-gray-500 dark:text-gray-400 text-center mb-8 text-sm">
+                    Please sign in to continue to your account.
+                </p>
+                <form method="POST" action="/" class="space-y-6">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Enter your username" class="w-full input-field px-4 py-2 border rounded-lg focus:outline-none focus:ring-2">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                        <input type="password" id="password" name="password" placeholder="••••••••" class="w-full input-field px-4 py-2 border rounded-lg focus:outline-none focus:ring-2">
+                    </div>
+                    <button type="submit" class="btn-primary text-white rounded-lg py-3 px-6 w-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.01] active:scale-95">
+                        Log In
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            if (html.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</body>
+</html>

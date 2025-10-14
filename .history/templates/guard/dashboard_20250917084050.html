@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Guard Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 p-6">
+
+  <!-- Visitor Registration -->
+  <div class="card p-8 rounded-2xl shadow-xl space-y-6 bg-white dark:bg-gray-800">
+    <h2 class="text-2xl font-bold text-slate-500 dark:text-slate-100">Visitor Registration</h2>
+
+    <form id="registration-form" class="space-y-4">
+      <input type="text" id="full-name" placeholder="Full Name" class="w-full border p-2 rounded">
+      <input type="text" id="plate-number" placeholder="Plate Number" class="w-full border p-2 rounded">
+      <input type="text" id="id-type" placeholder="ID Type" class="w-full border p-2 rounded">
+      <input type="text" id="id-number" placeholder="ID Number" class="w-full border p-2 rounded">
+      <input type="text" id="purpose" placeholder="Purpose" class="w-full border p-2 rounded">
+      <input type="date" id="visit-date" class="w-full border p-2 rounded">
+      <input type="time" id="visit-time" class="w-full border p-2 rounded">
+      <input type="text" id="vehicle-type" placeholder="Vehicle Type" class="w-full border p-2 rounded">
+      <input type="text" id="vehicle-name" placeholder="Vehicle Name" class="w-full border p-2 rounded">
+
+      <!-- Photo Capture -->
+      <div class="flex space-x-4">
+        <div id="camera" class="w-40 h-32 bg-gray-300 rounded"></div>
+        <div id="preview" class="w-40 h-32 bg-gray-200 rounded flex justify-center items-center">
+          <img src="https://placehold.co/160x160/cbd5e1/2d3748?text=Photo" alt="Visitor photo placeholder">
+        </div>
+      </div>
+      <input type="hidden" id="photo-input">
+      <button type="button" onclick="takeSnapshot()" class="bg-blue-600 text-white px-4 py-2 rounded">Capture Photo</button>
+
+      <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Register Visitor</button>
+    </form>
+
+    <!-- Generated QR Result -->
+    <div id="qr-result" class="hidden mt-6 fade-in">
+      <h3 class="text-xl font-semibold text-slate-500 dark:text-slate-100 mb-2">Visitor QR Pass</h3>
+      <p id="qr-details" class="text-sm text-slate-500 dark:text-slate-400 mb-2"></p>
+      <div class="flex space-x-6">
+        <div id="qr-code"></div>
+        <div>
+          <p class="font-semibold">Valid Until:</p>
+          <p id="expiry-date" class="text-red-500"></p>
+        </div>
+      </div>
+      <button onclick="printQRCode()" class="bg-purple-600 text-white px-4 py-2 rounded mt-4">Print QR</button>
+    </div>
+  </div>
+
+  <!-- Entrance Scanner -->
+  <div class="card p-8 rounded-2xl shadow-xl space-y-6 mt-10 bg-white dark:bg-gray-800">
+    <h2 class="text-2xl font-bold text-slate-500 dark:text-slate-100">Entrance Scanner</h2>
+    <div id="scanner-container">
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Scan visitor QR code at the entrance for verification.</p>
+      <div id="scanner-placeholder" class="w-full aspect-video bg-slate-200 dark:bg-slate-700 rounded-xl flex justify-center items-center text-slate-400 dark:text-slate-500">
+        <p class="text-center p-4">IoT Scanner would be active here in production. Click the button below to simulate.</p>
+      </div>
+      <button onclick="simulateScan()" class="btn w-full mt-4 text-white font-semibold py-3 px-4 rounded-full bg-blue-500">
+        Simulate QR Scan (Demo)
+      </button>
+    </div>
+    
+    <div id="scan-result" class="mt-6 hidden fade-in">
+      <h3 class="text-xl font-semibold text-slate-500 dark:text-slate-100 mb-4">Visitor Details</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Visitor Photo + QR side by side -->
+        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg col-span-2 flex flex-row justify-center items-center space-x-6">
+          <div>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-2">Visitor Photo</p>
+            <img id="scanned-photo" src="https://placehold.co/160x160/cbd5e1/2d3748?text=Photo" alt="Scanned visitor photo" class="w-32 h-32 rounded-full object-cover border-4 border-slate-200 dark:border-slate-700" />
+          </div>
+          <div>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-2">Visitor QR</p>
+            <div id="scanned-qr" class="w-32 h-32"></div>
+          </div>
+        </div>
+        <div class="p-4 bg-slate-50 dark:bg-slate-500 rounded-lg">
+          <p class="text-slate-500 dark:text-slate-400 text-sm">Full Name</p>
+          <p id="scanned-name" class="font-semibold text-lg"></p>
+        </div>
+        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+          <p class="text-slate-500 dark:text-slate-400 text-sm">Plate Number</p>
+          <p id="scanned-plate" class="font-semibold text-lg"></p>
+        </div>
+        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+          <p class="text-slate-500 dark:text-slate-400 text-sm">Visit Date</p>
+          <p id="scanned-date" class="font-semibold"></p>
+        </div>
+        <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+          <p class="text-slate-500 dark:text-slate-400 text-sm">Visit Time</p>
+          <p id="scanned-time" class="font-semibold"></p>
+        </div>
+      </div>
+      <div class="mt-4 p-4 rounded-lg" id="validity-status">
+        <p class="font-bold text-lg"></p>
+        <p class="text-sm"></p>
+      </div>
+      <button onclick="resetScanner()" class="btn btn-gray w-full mt-4 text-white font-semibold py-3 px-4 rounded-full bg-gray-600">
+        Reset Scanner
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    let currentVisitor = null;
+
+    // Webcam
+    Webcam.set({ width: 320, height: 240, image_format: 'jpeg', jpeg_quality: 90 });
+    Webcam.attach('#camera');
+
+    function takeSnapshot() {
+      Webcam.snap(function(data_uri) {
+        document.getElementById('preview').innerHTML = `<img src="${data_uri}" class="w-full h-full object-cover">`;
+        document.getElementById('photo-input').value = data_uri;
+      });
+    }
+
+    // Visitor registration
+    document.getElementById('registration-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const fullName = document.getElementById('full-name').value;
+      const plateNumber = document.getElementById('plate-number').value;
+      const idType = document.getElementById('id-type').value;
+      const idNumber = document.getElementById('id-number').value;
+      const purpose = document.getElementById('purpose').value;
+      const visitDate = document.getElementById('visit-date').value;
+      const visitTime = document.getElementById('visit-time').value;
+      const vehicleType = document.getElementById('vehicle-type').value;
+      const vehicleName = document.getElementById('vehicle-name').value;
+      const photoData = document.querySelector('#preview img').src;
+
+      const today = new Date();
+      const expiryDate = new Date(today.setFullYear(today.getFullYear() + 1));
+
+      currentVisitor = {
+        fullName,
+        plateNumber,
+        idType,
+        idNumber,
+        purpose,
+        visitDate,
+        visitTime,
+        vehicleType,
+        vehicleName,
+        photo: photoData,
+        expiryDate: expiryDate.toISOString()
+      };
+
+      // Show QR result
+      document.getElementById('qr-result').classList.remove('hidden');
+      document.getElementById('qr-details').textContent = `${fullName} - Plate: ${plateNumber}`;
+      document.getElementById('expiry-date').textContent = expiryDate.toDateString();
+
+      new QRCode(document.getElementById("qr-code"), {
+        text: JSON.stringify(currentVisitor),
+        width: 128,
+        height: 128
+      });
+    });
+
+    function printQRCode() {
+      window.print();
+    }
+
+    function simulateScan() {
+      if (!currentVisitor) {
+        alert("No visitor registered yet!");
+        return;
+      }
+      document.getElementById('scanner-placeholder').classList.add('hidden');
+      document.getElementById('scan-result').classList.remove('hidden');
+
+      document.getElementById('scanned-photo').src = currentVisitor.photo;
+      document.getElementById('scanned-name').textContent = currentVisitor.fullName;
+      document.getElementById('scanned-plate').textContent = currentVisitor.plateNumber;
+      document.getElementById('scanned-date').textContent = currentVisitor.visitDate;
+      document.getElementById('scanned-time').textContent = currentVisitor.visitTime;
+
+      // Generate scanned QR
+      document.getElementById('scanned-qr').innerHTML = "";
+      new QRCode(document.getElementById("scanned-qr"), {
+        text: JSON.stringify(currentVisitor),
+        width: 128,
+        height: 128
+      });
+
+      const statusBox = document.getElementById('validity-status');
+      const expiry = new Date(currentVisitor.expiryDate);
+      if (expiry > new Date()) {
+        statusBox.className = "mt-4 p-4 rounded-lg bg-green-100 text-green-800";
+        statusBox.innerHTML = `<p class="font-bold text-lg">✅ Valid</p><p class="text-sm">QR Code is still active.</p>`;
+      } else {
+        statusBox.className = "mt-4 p-4 rounded-lg bg-red-100 text-red-800";
+        statusBox.innerHTML = `<p class="font-bold text-lg">❌ Expired</p><p class="text-sm">QR Code is no longer valid.</p>`;
+      }
+    }
+
+    function resetScanner() {
+      document.getElementById('scanner-placeholder').classList.remove('hidden');
+      document.getElementById('scan-result').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
